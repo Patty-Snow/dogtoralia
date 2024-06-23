@@ -12,7 +12,7 @@ class CreatePetOwnersTable extends Migration
             $table->string('name', 45); 
             $table->string('last_name', 45); 
             $table->string('email', 70)->unique(); 
-            $table->string('password', 45); 
+            $table->string('password', 255); 
             $table->string('phone_number', 13); 
             $table->timestamp('registration_date')->useCurrent();
             $table->text('profile_photo')->nullable();

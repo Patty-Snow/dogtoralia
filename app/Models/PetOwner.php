@@ -18,9 +18,7 @@ class PetOwner extends Model
         'phone_number',
         'profile_photo',
     ];
-
-    public $timestamps = false; 
-
+    
     protected $hidden = [
         'password',
     ];
