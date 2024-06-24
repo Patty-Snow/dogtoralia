@@ -40,15 +40,24 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        
-        'api' => [
-        'driver' => 'jwt',
-        'provider' => 'users',
-      ],
 
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
+
+        'pet_owner_api' => [
+            'driver' => 'jwt',
+            'provider' => 'pet_owners',
+        ],
+
+        'business_owner_api' => [
+            'driver' => 'jwt',
+            'provider' => 'business_owners',
+        ],
     ],
 
-    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -73,10 +82,22 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        'pet_owners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\PetOwner::class,
+        ],
+
+        'business_owners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\BusinessOwner::class,
+        ],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+
     ],
 
     /*

@@ -35,7 +35,7 @@ class AuthController extends Controller
             'user' => $user,
             'authorisation' => [
                 'token' => $token,
-                'type' => 'bearer',
+                'type' => 'jwt bearer',
             ]
         ]);
     }
