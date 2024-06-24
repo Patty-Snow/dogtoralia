@@ -1,30 +1,4 @@
 <?php
-<<<<<<< HEAD
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-
-class PetOwner extends Model 
-{
-    use HasFactory, Notifiable;
-
-    protected $fillable = [
-        'name',
-        'last_name',
-        'email',
-        'password',
-        'phone_number',
-        'profile_photo',
-    ];
-    
-    protected $hidden = [
-        'password',
-    ];
-}
-=======
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
@@ -74,4 +48,3 @@ class PetOwner extends Authenticatable implements JWTSubject
         ];
     }
 }
->>>>>>> main

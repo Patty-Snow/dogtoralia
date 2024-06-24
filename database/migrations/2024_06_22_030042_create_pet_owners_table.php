@@ -14,10 +14,6 @@ class CreatePetOwnersTable extends Migration
             $table->string('email', 70)->unique(); 
             $table->string('password', 255); 
             $table->string('phone_number', 13); 
-<<<<<<< HEAD
-            $table->timestamp('registration_date')->useCurrent();
-=======
->>>>>>> main
             $table->text('profile_photo')->nullable();
             $table->timestamps();
         });
