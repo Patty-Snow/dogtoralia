@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
@@ -7,7 +8,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class PetOwner extends Authenticatable implements JWTSubject
+class StylistVeterinarian extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -15,9 +16,10 @@ class PetOwner extends Authenticatable implements JWTSubject
         'name', 
         'last_name', 
         'phone_number', 
-        'profile_photo', 
         'email', 
-        'password'
+        'password', 
+        'profile_photo', 
+        'business_id'
     ];
 
     protected $hidden = [
@@ -50,5 +52,10 @@ class PetOwner extends Authenticatable implements JWTSubject
             'email' => $this->email,
             'name' => $this->name,
         ];
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
     }
 }

@@ -10,12 +10,12 @@ class CreateStylistsVeterinariansTable extends Migration
     {
         Schema::create('stylists_veterinarians', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name', 45);
+            $table->string('name', 45);
             $table->string('last_name', 45);
             $table->string('surname', 45);
             $table->string('email', 70)->unique();
             $table->string('password', 255);
-            $table->timestamp('registration_date');
+            $table->string('phone_number', 13); 
             $table->text('profile_photo');
             $table->foreignId('business_id')->constrained('businesses'); 
             $table->timestamps();
