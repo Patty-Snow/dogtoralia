@@ -17,6 +17,7 @@ class CreateBusinessOwnersTable extends Migration
             $table->string('phone_number', 13);
             $table->string('rfc', 13)->unique();
             $table->text('profile_photo')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
         });

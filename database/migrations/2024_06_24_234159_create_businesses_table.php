@@ -19,6 +19,7 @@ class CreateBusinessesTable extends Migration
             $table->foreignId('business_owner_id')->constrained('business_owners'); 
             // $table->foreignId('address_id')->constrained('addresses'); 
             //$table->foreignId('availability_id')->constrained('availabilities'); 
+            $table->softDeletes();
             $table->timestamps();
         });
     }
