@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PetOwnerController;
+use App\Http\Controllers\BusinessOwnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,5 +40,36 @@ Route::prefix('pet_owner')->group(function () {
 
         Route::get('me', [PetOwnerController::class, 'show']);
         Route::put('update', [PetOwnerController::class, 'update']);
+        Route::delete('delete', [PetOwnerController::class, 'destroy']);
     });
 });
+
+//Rutas para Business Owner
+Route::prefix('business_owner')->group(function () {
+    Route::post('register', [BusinessOwnerController::class, 'register']);
+    Route::post('login', [BusinessOwnerController::class, 'login']);
+
+    Route::middleware('auth:business_owner_api')->group(function () {
+        Route::post('refresh', [BusinessOwnerController::class, 'refresh']);
+        Route::post('logout', [BusinessOwnerController::class, 'logout']);
+
+        Route::get('me', [BusinessOwnerController::class, 'show']);
+        Route::put('update', [BusinessOwnerController::class, 'update']);
+        Route::delete('delete', [BusinessOwnerController::class, 'destroy']);
+    });
+});
+
+
+//Rutas para crud de negocio
+
+use App\Http\Controllers\BusinessController;
+
+//Route::middleware('auth:business_owner_api')->group(function () {
+    Route::prefix('business')->group(function () {
+    Route::get('/', [BusinessController::class, 'index']);
+    Route::post('register', [BusinessController::class, 'store']);
+    Route::get('/{id}', [BusinessController::class, 'show']);
+    Route::put('/{id}', [BusinessController::class, 'update']);
+    Route::delete('/{id}', [BusinessController::class, 'destroy']);
+    });
+// });

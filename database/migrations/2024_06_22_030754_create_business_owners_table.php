@@ -13,7 +13,7 @@ class CreateBusinessOwnersTable extends Migration
             $table->string('name', 45);
             $table->string('last_name');
             $table->string('email', 70)->unique();
-            $table->string('password', 45);
+            $table->string('password', 255);
             $table->string('phone_number', 13);
             $table->string('rfc', 13)->unique();
             $table->text('profile_photo')->nullable();
