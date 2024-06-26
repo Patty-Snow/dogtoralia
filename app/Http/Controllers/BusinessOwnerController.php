@@ -261,4 +261,66 @@ class BusinessOwnerController extends Controller
             ], 500);
         }
     }
+
+    public function restore($id)
+    {
+        try {
+            $businessOwner = BusinessOwner::onlyTrashed()->findOrFail($id);
+            $businessOwner->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile restored successfully',
+                'user' => $businessOwner
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to restore the profile',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $businessOwner = BusinessOwner::onlyTrashed()->findOrFail($id);
+
+            if ($businessOwner->profile_photo) {
+                Storage::disk('public')->delete($businessOwner->profile_photo);
+            }
+
+            $businessOwner->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile permanently deleted',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to permanently delete the profile',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function trashed()
+    {
+        try {
+            $trashedBusinessOwners = BusinessOwner::onlyTrashed()->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $trashedBusinessOwners,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to fetch trashed profiles',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

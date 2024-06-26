@@ -175,10 +175,6 @@ class BusinessController extends Controller
         }
     }
 
-
-
-
-
     public function destroy($id)
     {
         try {
@@ -199,6 +195,72 @@ class BusinessController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while deleting the business',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $business = Business::where('id', $id)->where('business_owner_id', $businessOwner->id)->onlyTrashed()->firstOrFail();
+
+            $business->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Business restored successfully',
+                'business' => $business,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while restoring the business',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $business = Business::where('id', $id)->where('business_owner_id', $businessOwner->id)->onlyTrashed()->firstOrFail();
+
+            if ($business->profile_photo) {
+                Storage::disk('public')->delete($business->profile_photo);
+            }
+
+            $business->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Business permanently deleted',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while permanently deleting the business',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function trashed()
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $trashedBusinesses = Business::where('business_owner_id', $businessOwner->id)->onlyTrashed()->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $trashedBusinesses,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching trashed businesses',
                 'error' => $e->getMessage(),
             ], 500);
         }

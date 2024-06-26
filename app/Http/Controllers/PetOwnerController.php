@@ -11,10 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class PetOwnerController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore']]);
+    // }
 
     public function register(Request $request)
     {
@@ -259,4 +259,68 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
+
+
+    public function restore($id)
+    {
+        try {
+            $petOwner = PetOwner::onlyTrashed()->findOrFail($id);
+            $petOwner->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile restored successfully',
+                'user' => $petOwner
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to restore the profile',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $petOwner = PetOwner::onlyTrashed()->findOrFail($id);
+
+            if ($petOwner->profile_photo) {
+                Storage::disk('public')->delete($petOwner->profile_photo);
+            }
+
+            $petOwner->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile permanently deleted',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to permanently delete the profile',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function trashed()
+    {
+        try {
+            $trashedPetOwners = PetOwner::onlyTrashed()->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $trashedPetOwners,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while trying to fetch trashed profiles',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
