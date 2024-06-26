@@ -4,10 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-use App\Http\Controllers\PetOwnerController;
-use App\Http\Controllers\BusinessOwnerController;
-use App\Http\Controllers\StylistVeterinarianController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\PetOwnerController;
+use App\Http\Controllers\GeolocationController;
+use App\Http\Controllers\BusinessOwnerController;
+use App\Http\Controllers\StaffController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,20 +72,20 @@ Route::prefix('business')->group(function () {
 });
 // });
 
-// Rutas para Stylist Veterinarian
-Route::prefix('stylist_veterinarian')->group(function () {
-    Route::post('register', [StylistVeterinarianController::class, 'register']);
-    Route::post('login', [StylistVeterinarianController::class, 'login']);
-    Route::post('refresh', [StylistVeterinarianController::class, 'refresh']);
-    Route::post('logout', [StylistVeterinarianController::class, 'logout']);
-    Route::get('me', [StylistVeterinarianController::class, 'show']);
+// Rutas para Staff
+Route::prefix('staff')->group(function () {
+    Route::post('register', [StaffController::class, 'register']);
+    Route::post('login', [StaffController::class, 'login']);
+    Route::post('refresh', [StaffController::class, 'refresh']);
+    Route::post('logout', [StaffController::class, 'logout']);
+    Route::get('me', [StaffController::class, 'show']);
 
-    Route::get('/', [StylistVeterinarianController::class, 'index']);
-    Route::get('/{id}', [StylistVeterinarianController::class, 'show']);
-    Route::put('/{id}', [StylistVeterinarianController::class, 'update']);
-    Route::delete('/{id}', [StylistVeterinarianController::class, 'destroy']);
+    Route::get('/', [StaffController::class, 'index']);
+    Route::get('/{id}', [StaffController::class, 'show']);
+    Route::put('/{id}', [StaffController::class, 'update']);
+    Route::delete('/{id}', [StaffController::class, 'destroy']);
 
-    Route::get('trashed', [StylistVeterinarianController::class, 'trashed']);
-    Route::post('restore/{id}', [StylistVeterinarianController::class, 'restore']);
-    Route::post('force_delete/{id}', [StylistVeterinarianController::class, 'forceDelete']);
+    Route::get('trashed', [StaffController::class, 'trashed']);
+    Route::post('restore/{id}', [StaffController::class, 'restore']);
+    Route::post('force_delete/{id}', [StaffController::class, 'forceDelete']);
 });

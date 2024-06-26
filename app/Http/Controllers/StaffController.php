@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StylistVeterinarian;
+use App\Models\Staff;
 use App\Models\Business;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
-class StylistVeterinarianController extends Controller
+class StaffController extends Controller
 {
     public function __construct()
     {
@@ -22,7 +22,7 @@ class StylistVeterinarianController extends Controller
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylists = StylistVeterinarian::whereIn('business_id', $businesses)->get();
+            $stylists = Staff::whereIn('business_id', $businesses)->get();
 
             return response()->json([
                 'status' => 'success',
