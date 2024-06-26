@@ -12,12 +12,12 @@ class CreateStylistsVeterinariansTable extends Migration
             $table->id();
             $table->string('name', 45);
             $table->string('last_name', 45);
-            $table->string('surname', 45);
             $table->string('email', 70)->unique();
             $table->string('password', 255);
             $table->string('phone_number', 13); 
-            $table->text('profile_photo');
+            $table->text('profile_photo')->nullable();
             $table->foreignId('business_id')->constrained('businesses'); 
+            $table->softDeletes();
             $table->timestamps();
         });
     }

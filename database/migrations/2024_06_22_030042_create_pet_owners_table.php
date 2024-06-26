@@ -15,6 +15,7 @@ class CreatePetOwnersTable extends Migration
             $table->string('password', 255); 
             $table->string('phone_number', 13); 
             $table->text('profile_photo')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -35,7 +35,7 @@ class AuthController extends Controller
             'user' => $user,
             'authorisation' => [
                 'token' => $token,
-                'type' => 'jwt bearer',
+                'type' => 'bearer',
             ]
         ]);
     }
@@ -60,7 +60,7 @@ class AuthController extends Controller
         return response()->json([
                 'status' => 'success',
                 'user' => $user,
-                'authorisation' => [
+                'authorization' => [
                     'token' => $token,
                     'type' => 'bearer',
                 ]

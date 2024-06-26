@@ -1,14 +1,15 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class BusinessOwner extends Model 
+class BusinessOwner extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -17,13 +18,33 @@ class BusinessOwner extends Model
         'password',
         'phone_number',
         'rfc',
-        'registration_date',
         'profile_photo',
     ];
 
-    public $timestamps = false; 
-
     protected $hidden = [
         'password',
+        'remember_token',
     ];
+
+    public $timestamps = true;
+
+    /**
+     * Get the identifier that will be stored in the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
