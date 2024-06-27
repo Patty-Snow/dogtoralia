@@ -22,16 +22,16 @@ class StaffController extends Controller
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylists = Staff::whereIn('business_id', $businesses)->get();
+            $staff = Staff::whereIn('business_id', $businesses)->get();
 
             return response()->json([
                 'status' => 'success',
-                'stylists' => $stylists,
+                'staff' => $staff,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while fetching stylists',
+                'message' => 'An error occurred while fetching staff',
                 'error' => $e->getMessage(),
             ], 500);
         }
