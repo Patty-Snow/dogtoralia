@@ -89,3 +89,8 @@ Route::prefix('staff')->group(function () {
     Route::post('restore/{id}', [StaffController::class, 'restore']);
     Route::post('force_delete/{id}', [StaffController::class, 'forceDelete']);
 });
+
+
+//Rutas para formatear dirección a partir de coordenadas
+
+Route::post('/get-address', [GeolocationController::class, 'getAddress']);

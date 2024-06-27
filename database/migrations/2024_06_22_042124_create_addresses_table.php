@@ -10,10 +10,10 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->string('city', 30);
-            $table->string('state', 30);
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
             $table->integer('postal_code');
-            $table->text('references');
+            $table->text('references')->nullable();
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 10, 8);
             $table->text('formatted_address');

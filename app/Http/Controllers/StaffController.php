@@ -12,10 +12,10 @@ use Illuminate\Validation\ValidationException;
 
 class StaffController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:business_owner_api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:business_owner_api');
+    // }
 
     public function index()
     {
@@ -37,69 +37,22 @@ class StaffController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:stylists_veterinarians'],
-                'password' => ['required', 'string', 'min:8'],
-                'profile_photo' => ['nullable', 'image', 'max:2048'],
-                'business_id' => ['required', 'exists:businesses,id'],
-            ]);
-
-            $profilePhotoPath = null;
-            if ($request->hasFile('profile_photo')) {
-                $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
-            }
-
-            $stylist = StylistVeterinarian::create([
-                'name' => $request->name,
-                'last_name' => $request->last_name,
-                'phone_number' => $request->phone_number,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'profile_photo' => $profilePhotoPath,
-                'business_id' => $request->business_id,
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Stylist created successfully',
-                'stylist' => $stylist,
-            ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation error',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while creating the stylist',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
 
     public function show($id)
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylist = StylistVeterinarian::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
+            $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
 
             return response()->json([
                 'status' => 'success',
-                'stylist' => $stylist,
+                'staff' => $staff,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while fetching the stylist',
+                'message' => 'An error occurred while fetching the staff',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -133,7 +86,7 @@ class StaffController extends Controller
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
     
-            $stylist = StylistVeterinarian::create([
+            $staff = Staff::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
                 'phone_number' => $request->phone_number,
@@ -145,8 +98,8 @@ class StaffController extends Controller
     
             return response()->json([
                 'status' => 'success',
-                'message' => 'Stylist registered successfully',
-                'stylist' => $stylist,
+                'message' => 'Staff registered successfully',
+                'staff' => $staff,
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -157,7 +110,7 @@ class StaffController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while registering the stylist',
+                'message' => 'An error occurred while registering the staff',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -169,7 +122,7 @@ class StaffController extends Controller
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylist = StylistVeterinarian::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
+            $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
 
             $request->validate([
                 'name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
@@ -193,43 +146,43 @@ class StaffController extends Controller
             
 
             if ($request->hasFile('profile_photo')) {
-                if ($stylist->profile_photo) {
-                    Storage::disk('public')->delete($stylist->profile_photo);
+                if ($staff->profile_photo) {
+                    Storage::disk('public')->delete($staff->profile_photo);
                 }
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
-                $stylist->profile_photo = $profilePhotoPath;
+                $staff->profile_photo = $profilePhotoPath;
             }
 
             if ($request->has('name')) {
-                $stylist->name = $request->name;
+                $staff->name = $request->name;
             }
 
             if ($request->has('last_name')) {
-                $stylist->last_name = $request->last_name;
+                $staff->last_name = $request->last_name;
             }
 
             if ($request->has('phone_number')) {
-                $stylist->phone_number = $request->phone_number;
+                $staff->phone_number = $request->phone_number;
             }
 
             if ($request->has('email')) {
-                $stylist->email = $request->email;
+                $staff->email = $request->email;
             }
 
             if ($request->has('password')) {
-                $stylist->password = Hash::make($request->password);
+                $staff->password = Hash::make($request->password);
             }
 
             if ($request->has('business_id')) {
-                $stylist->business_id = $request->business_id;
+                $staff->business_id = $request->business_id;
             }
 
-            $stylist->save();
+            $staff->save();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Stylist updated successfully',
-                'stylist' => $stylist,
+                'message' => 'Staff updated successfully',
+                'staff' => $staff,
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -240,7 +193,7 @@ class StaffController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while updating the stylist',
+                'message' => 'An error occurred while updating the staff',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -251,22 +204,22 @@ class StaffController extends Controller
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylist = StylistVeterinarian::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
+            $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
 
-            if ($stylist->profile_photo) {
-                Storage::disk('public')->delete($stylist->profile_photo);
+            if ($staff->profile_photo) {
+                Storage::disk('public')->delete($staff->profile_photo);
             }
 
-            $stylist->delete();
+            $staff->delete();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Stylist deleted successfully',
+                'message' => 'Staff deleted successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while deleting the stylist',
+                'message' => 'An error occurred while deleting the staff',
                 'error' => $e->getMessage(),
             ], 500);
         }

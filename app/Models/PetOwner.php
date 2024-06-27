@@ -52,4 +52,9 @@ class PetOwner extends Authenticatable implements JWTSubject
             'name' => $this->name,
         ];
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }
