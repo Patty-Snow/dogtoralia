@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class StylistVeterinarian extends Authenticatable implements JWTSubject
+class Staff extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
-    protected $table = 'stylists_veterinarians';
+    protected $table = 'staffs';
 
     protected $fillable = [
         'name', 
