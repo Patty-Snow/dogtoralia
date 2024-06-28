@@ -2,13 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PetController;
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
-use App\Http\Controllers\StaffController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,20 @@ Route::prefix('pet_owner')->group(function () {
     Route::post('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
 });
 
+
+//Rutas para pets
+
+Route::middleware('auth:pet_owner_api')->group(function () {
+    Route::prefix('pets')->group(function () {
+        Route::get('/', [PetController::class, 'index'])->name('pets.index');
+        Route::post('/', [PetController::class, 'store'])->name('pets.store');
+        Route::get('/{id}', [PetController::class, 'show'])->name('pets.show');
+        Route::put('/{id}', [PetController::class, 'update'])->name('pets.update');
+        Route::delete('/{id}', [PetController::class, 'destroy'])->name('pets.destroy');
+    });
+});
+
+
 //Rutas para Business Owner
 Route::prefix('business_owner')->group(function () {
     Route::post('register', [BusinessOwnerController::class, 'register']);
@@ -58,7 +73,7 @@ Route::prefix('business_owner')->group(function () {
 });
 
 
-//Rutas para crud de negocio
+//Rutas para business
 
 
 
@@ -71,6 +86,7 @@ Route::prefix('business')->group(function () {
     Route::delete('/{id}', [BusinessController::class, 'destroy']);
 });
 // });
+
 
 // Rutas para Staff
 Route::prefix('staff')->group(function () {

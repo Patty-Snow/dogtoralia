@@ -12,21 +12,21 @@ use Illuminate\Validation\ValidationException;
 
 class StaffController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:business_owner_api');
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth:business_owner_api');
+    }
 
     public function index()
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
             $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
-            $stylists = Staff::whereIn('business_id', $businesses)->get();
+            $staff = Staff::whereIn('business_id', $businesses)->get();
 
             return response()->json([
                 'status' => 'success',
-                'stylists' => $stylists,
+                'stylists' => $staff,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -64,7 +64,7 @@ class StaffController extends Controller
             $request->validate([
                 'name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
                 'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:stylists_veterinarians'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:staffs'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
@@ -125,16 +125,16 @@ class StaffController extends Controller
             $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->firstOrFail();
 
             $request->validate([
-                'name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
-                'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:stylists_veterinarians'],
+                'name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
+                'last_name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
+                'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:staffs'],
                 'password' => [
-                    'required', 'string', 'min:8', 'confirmed',
+                    'sometimes', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
                 ],
-                'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
+                'phone_number' => ['sometimes', 'string', 'regex:/^[0-9]{9,15}$/'],
                 'profile_photo' => ['nullable', 'image', 'max:2048'],
-                'business_id' => ['required', 'exists:businesses,id'],
+                'business_id' => ['sometimes', 'exists:businesses,id'],
             ], [
                 'name.regex' => 'The name can only contain letters and spaces, including letters with accents.',
                 'last_name.regex' => 'The last name can only contain letters and spaces, including letters with accents.',
