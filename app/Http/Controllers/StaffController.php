@@ -224,4 +224,73 @@ class StaffController extends Controller
             ], 500);
         }
     }
+
+    public function trashed()
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
+            $trashedStaff = Staff::whereIn('business_id', $businesses)->onlyTrashed()->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $trashedStaff,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching trashed staff',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
+            $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->onlyTrashed()->firstOrFail();
+
+            $staff->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Staff restored successfully',
+                'staff' => $staff,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while restoring the staff',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $businesses = Business::where('business_owner_id', $businessOwner->id)->pluck('id');
+            $staff = Staff::where('id', $id)->whereIn('business_id', $businesses)->onlyTrashed()->firstOrFail();
+
+            if ($staff->profile_photo) {
+                Storage::disk('public')->delete($staff->profile_photo);
+            }
+
+            $staff->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Staff permanently deleted',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while permanently deleting the staff',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
