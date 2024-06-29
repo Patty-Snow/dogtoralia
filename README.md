@@ -71,3 +71,81 @@
   - **URL:** `https://devs-devitm.com/api/pet_owner/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
+
+
+
+### Autenticación y Gestión de Dueños de Negocios (Business Owners)
+
+- **Registrar un nuevo dueño de negocio**
+  - **URL:** `https://devs-devitm.com/api/business_owner/register`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+      "name": "Alice",
+      "last_name": "Johnson",
+      "email": "alice@dogtoralia.com",
+      "password": "Password123!",
+      "password_confirmation": "Password123!",
+      "phone_number": "1234567890",
+      "rfc": "RFC123456789",
+    }
+    ```
+
+- **Login**
+  - **URL:** `https://devs-devitm.com/api/business_owner/login`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+      "email": "alice@dogtoralia.com",
+      "password": "Password123!"
+    }
+    ```
+
+- **Refrescar token**
+  - **URL:** `https://devs-devitm.com/api/business_owner/refresh`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
+
+- **Logout**
+  - **URL:** `https://devs-devitm.com/api/business_owner/logout`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
+
+- **Obtener detalles del dueño de negocio autenticado**
+  - **URL:** `https://devs-devitm.com/api/business_owner/me`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+- **Actualizar información del dueño de negocio**
+  - **URL:** `https://devs-devitm.com/api/business_owner/update`
+  - **Método:** `PUT`
+  - **Body:**
+    ```json
+    {
+      "name": "Alice",
+      "last_name": "Updated",
+   
+    }
+    ```
+
+- **Eliminar dueño de negocio**
+  - **URL:** `https://devs-devitm.com/api/business_owner/delete`
+  - **Método:** `DELETE`
+  - **Body:** *No requiere cuerpo*
+
+- **Listar dueños de negocios eliminados**
+  - **URL:** `https://devs-devitm.com/api/business_owner/trashed`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+- **Restaurar dueño de negocio eliminado**
+  - **URL:** `https://devs-devitm.com/api/business_owner/restore/{id}`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
+
+- **Eliminar permanentemente dueño de negocio**
+  - **URL:** `https://devs-devitm.com/api/business_owner/force_delete/{id}`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
