@@ -250,3 +250,63 @@
   - **URL:** `https://devs-devitm.com/api/pets/{id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
+
+****
+
+### Gestión de Personal
+
+- **Listar todo el personal**
+  - **URL:** `https://devs-devitm.com/api/staff`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+- **Registrar un nuevo miembro del personal**
+  - **URL:** `https://devs-devitm.com/api/staff`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+      "name": "Dr. Smith",
+      "last_name": "Johnson",
+      "email": "drsmith@dogtoralia.com",
+      "password": "Password123!",
+      "password_confirmation": "Password123!",
+      "phone_number": "1234567890",
+      "business_id": 1
+    }
+    ```
+
+- **Obtener detalles de un miembro del personal**
+  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+- **Actualizar información de un miembro del personal**
+  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **Método:** `PUT`
+  - **Body:**
+    ```json
+    {
+      "name": "Dr. John Smith",
+    }
+    ```
+
+- **Eliminar un miembro del personal**
+  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **Método:** `DELETE`
+  - **Body:** *No requiere cuerpo*
+
+- **Listar personal eliminado**
+  - **URL:** `https://devs-devitm.com/api/staff/trashed`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+- **Restaurar personal eliminado**
+  - **URL:** `https://devs-devitm.com/api/staff/restore/{id}`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
+
+- **Eliminar permanentemente un miembro del personal**
+  - **URL:** `https://devs-devitm.com/api/staff/force_delete/{id}`
+  - **Método:** `POST`
+  - **Body:** *No requiere cuerpo*
