@@ -67,7 +67,6 @@ class StaffController extends Controller
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:staffs'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
                 'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
