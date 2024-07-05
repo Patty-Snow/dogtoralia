@@ -10,6 +10,7 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
+use App\Http\Controllers\StaffScheduleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +107,15 @@ Route::prefix('staff')->group(function () {
     Route::post('force_delete/{id}', [StaffController::class, 'forceDelete']);
 });
 
+
+//Rutas para gestión de horario del Staff
+
+Route::prefix('staff/schedules')->group(function () {
+    Route::get('/index', [StaffScheduleController::class, 'index']);
+    Route::post('/', [StaffScheduleController::class, 'store']);
+    Route::put('/{id}', [StaffScheduleController::class, 'update']);
+    Route::delete('/delete', [StaffScheduleController::class, 'destroy']);
+});
 
 //Rutas para formatear dirección a partir de coordenadas
 

@@ -14,7 +14,7 @@ class StaffController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:business_owner_api');
+        $this->middleware('auth:business_owner_api')->except(['login']);
     }
 
     public function index()
@@ -80,12 +80,12 @@ class StaffController extends Controller
                 'phone_number.regex' => 'The phone number can only contain numbers and should be between 9 and 15 digits.',
                 'business_id.exists' => 'Invalid business ID.',
             ]);
-            
+
             $profilePhotoPath = null;
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
-    
+
             $staff = Staff::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
@@ -95,7 +95,7 @@ class StaffController extends Controller
                 'profile_photo' => $profilePhotoPath,
                 'business_id' => $request->business_id,
             ]);
-    
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Staff registered successfully',
@@ -115,7 +115,46 @@ class StaffController extends Controller
             ], 500);
         }
     }
-    
+
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (!$token = Auth::guard('staff_api')->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer'
+        ]);
+    }
+
+    public function logout()
+    {
+        try {
+            Auth::guard('staff_api')->logout();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Successfully logged out',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while logging out',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 
     public function update(Request $request, $id)
     {
@@ -143,7 +182,7 @@ class StaffController extends Controller
                 'phone_number.regex' => 'The phone number can only contain numbers and should be between 9 and 15 digits.',
                 'business_id.exists' => 'Invalid business ID.',
             ]);
-            
+
 
             if ($request->hasFile('profile_photo')) {
                 if ($staff->profile_photo) {

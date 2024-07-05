@@ -14,8 +14,8 @@ class CreateAddressesTable extends Migration
             $table->string('state')->nullable();
             $table->integer('postal_code');
             $table->text('references')->nullable();
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 10, 8);
+            $table->decimal('latitude', 11, 8);
+            $table->decimal('longitude', 11, 8);
             $table->text('formatted_address');
             $table->unsignedBigInteger('pet_owner_id');
             $table->foreign('pet_owner_id')->references('id')->on('pet_owners')->onDelete('cascade');
