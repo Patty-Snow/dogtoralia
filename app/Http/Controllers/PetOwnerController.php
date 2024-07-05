@@ -25,7 +25,7 @@ class PetOwnerController extends Controller
                 'email' => ['required', 'string', 'email', 'unique:pet_owners,email'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
                 'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
                 'profile_photo' => ['nullable', 'image', 'max:2048'],
@@ -260,7 +260,6 @@ class PetOwnerController extends Controller
         }
     }
 
-
     public function restore($id)
     {
         try {
@@ -322,5 +321,4 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
-
 }
