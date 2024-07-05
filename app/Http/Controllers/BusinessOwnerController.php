@@ -25,7 +25,7 @@ class BusinessOwnerController extends Controller
                 'email' => ['required', 'string', 'email', 'unique:business_owners,email'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
                 'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
                 'rfc' => ['required', 'string', 'max:13'],
@@ -34,7 +34,7 @@ class BusinessOwnerController extends Controller
                 'name.regex' => 'Name can only contain letters and spaces.',
                 'last_name.regex' => 'Last name can only contain letters and spaces.',
                 'password.confirmed' => 'The password confirmation does not match.',
-                'phone_number.regex' => 'Phone number can only contain numbers and should be between 10 and 15 digits.',
+                'phone_number.regex' => 'Phone number can only contain numbers and should be between 9 and 15 digits.',
             ]);
 
             $profilePhotoPath = null;
@@ -75,6 +75,7 @@ class BusinessOwnerController extends Controller
             ], 500);
         }
     }
+
 
     public function login(Request $request)
     {
@@ -177,19 +178,21 @@ class BusinessOwnerController extends Controller
             $businessOwner = Auth::guard('business_owner_api')->user();
 
             $request->validate([
-                'name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'last_name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
+                'name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
+                'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
+                'email' => ['required', 'string', 'email', 'unique:business_owners,email'],
                 'password' => [
-                    'sometimes', 'string', 'min:8', 'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                    'required', 'string', 'min:8', 'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
-                'phone_number' => ['sometimes', 'string', 'regex:/^[0-9]{9,15}$/'],
+                'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
+                'rfc' => ['required', 'string', 'max:13'],
                 'profile_photo' => ['nullable', 'image', 'max:2048'],
             ], [
                 'name.regex' => 'Name can only contain letters and spaces.',
                 'last_name.regex' => 'Last name can only contain letters and spaces.',
                 'password.confirmed' => 'The password confirmation does not match.',
-                'phone_number.regex' => 'Phone number can only contain numbers and should be between 10 and 15 digits.',
+                'phone_number.regex' => 'Phone number can only contain numbers and should be between 9 and 15 digits.',
             ]);
 
             if ($request->filled('name')) {
