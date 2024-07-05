@@ -13,12 +13,12 @@ class GeolocationController extends Controller
         $request->validate([
             'lat' => 'required|numeric',
             'lon' => 'required|numeric',
-            // 'pet_owner_id' => 'required|exists:pet_owners,id',
+            'pet_owner_id' => 'required|exists:pet_owners,id',
         ]);
 
         $lat = $request->input('lat');
         $lon = $request->input('lon');
-        // $petOwnerId = $request->input('pet_owner_id');
+        $petOwnerId = $request->input('pet_owner_id');
 
         $url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={$lat}&lon={$lon}&addressdetails=1";
 
@@ -56,7 +56,7 @@ class GeolocationController extends Controller
                 'latitude' => $lat,
                 'longitude' => $lon,
                 'formatted_address' => $direccion,
-                // 'pet_owner_id' => $petOwnerId,
+                'pet_owner_id' => $petOwnerId,
             ]);
 
             return response()->json(['direccion' => $direccion, 'address' => $address]);

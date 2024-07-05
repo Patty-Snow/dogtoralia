@@ -11,10 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class PetOwnerController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore']]);
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore']]);
+    }
 
     public function register(Request $request)
     {
