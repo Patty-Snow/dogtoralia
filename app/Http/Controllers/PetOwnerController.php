@@ -13,7 +13,7 @@ class PetOwnerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore']]);
+        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
     }
 
     public function register(Request $request)
@@ -138,7 +138,7 @@ class PetOwnerController extends Controller
             return response()->json([
                 'status' => 'success',
                 'user' => Auth::guard('pet_owner_api')->user(),
-                'authorisation' => [
+                'authorization' => [
                     'token' => Auth::guard('pet_owner_api')->refresh(),
                     'type' => 'bearer',
                 ]
@@ -152,10 +152,26 @@ class PetOwnerController extends Controller
         }
     }
 
-    public function show()
+    public function show($pet_owner_id)
     {
         try {
-            $petOwner = Auth::guard('pet_owner_api')->user();
+            $authenticatedUser = Auth::user();
+
+            // Verificar si el usuario autenticado es el pet owner con el ID proporcionado
+            if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
+                $petOwner = Auth::guard('pet_owner_api')->user();
+            }
+            // Verificar si el usuario autenticado es un business owner o staff
+            elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+                $petOwner = PetOwner::findOrFail($pet_owner_id);
+            } else {
+                // Si no es un pet owner autenticado o un business owner/staff, lanzar excepción de no autorizado
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.',
+                ], 401);
+            }
+
             return response()->json([
                 'status' => 'success',
                 'user' => $petOwner
@@ -168,6 +184,7 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
+
 
     public function update(Request $request)
     {
@@ -319,6 +336,33 @@ class PetOwnerController extends Controller
                 'message' => 'An error occurred while trying to fetch trashed profiles',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    public function index(Request $request)
+    {
+        try {
+            // Verificar si el usuario autenticado es un business owner o staff
+            if (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+                // Definir el número de resultados por página con un valor predeterminado de 20
+                $perPage = $request->query('per_page', 20);
+
+                // Obtener todos los PetOwners, incluidos los eliminados
+                $petOwners = PetOwner::withTrashed()->paginate($perPage);
+
+                return response()->json([
+                    'status' => 'success',
+                    'pet_owners' => $petOwners,
+                ]);
+            } else {
+                // Otros casos, lanzar excepción de no autorizado
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.',
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching pet owners: ' . $e->getMessage()], 500);
         }
     }
 }

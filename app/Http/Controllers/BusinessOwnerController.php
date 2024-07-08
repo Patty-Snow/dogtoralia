@@ -141,7 +141,7 @@ class BusinessOwnerController extends Controller
             return response()->json([
                 'status' => 'success',
                 'user' => Auth::guard('business_owner_api')->user(),
-                'authorisation' => [
+                'authorization' => [
                     'token' => Auth::guard('business_owner_api')->refresh(),
                     'type' => 'bearer',
                 ]

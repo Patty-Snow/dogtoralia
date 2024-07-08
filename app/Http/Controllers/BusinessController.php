@@ -12,14 +12,34 @@ class BusinessController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:business_owner_api');
+        $this->middleware('auth:business_owner_api')->except(['indexAll', 'show']);;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
-            $businesses = Business::where('business_owner_id', $businessOwner->id)->get();
+
+            if (!$businessOwner) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access. No authenticated business owner found.',
+                ], 401);
+            }
+
+            // Obtener el número de resultados por página desde los parámetros de consulta o usar 20 por defecto
+            $perPage = $request->query('per_page', 20);
+
+            // Validar que perPage sea un número entero positivo
+            if (!is_numeric($perPage) || $perPage <= 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The per_page parameter must be a positive integer.',
+                ], 400);
+            }
+
+            // Obtener los negocios con paginación
+            $businesses = Business::where('business_owner_id', $businessOwner->id)->paginate((int)$perPage);
 
             return response()->json([
                 'status' => 'success',
@@ -33,6 +53,38 @@ class BusinessController extends Controller
             ], 500);
         }
     }
+
+
+    public function indexAll(Request $request)
+    {
+        try {
+            // Obtener el número de resultados por página desde los parámetros de consulta o usar 20 por defecto
+            $perPage = $request->query('per_page', 20);
+
+            // Validar que perPage sea un número entero positivo
+            if (!is_numeric($perPage) || $perPage <= 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The per_page parameter must be a positive integer.',
+                ], 400);
+            }
+
+            // Obtener todos los negocios con paginación
+            $businesses = Business::paginate((int)$perPage);
+
+            return response()->json([
+                'status' => 'success',
+                'businesses' => $businesses,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching businesses',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function store(Request $request)
     {
@@ -84,9 +136,9 @@ class BusinessController extends Controller
     public function show($id)
     {
         try {
-            $businessOwner = Auth::guard('business_owner_api')->user();
-            $business = Business::where('id', $id)->where('business_owner_id', $businessOwner->id)->firstOrFail();
-
+            // Obtener el negocio por su ID
+            $business = Business::findOrFail($id);
+    
             return response()->json([
                 'status' => 'success',
                 'business' => $business,
@@ -99,6 +151,7 @@ class BusinessController extends Controller
             ], 500);
         }
     }
+    
 
     public function update(Request $request, $id)
     {

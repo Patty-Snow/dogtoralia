@@ -10,28 +10,45 @@ use Illuminate\Validation\UnauthorizedException;
 
 class PetController extends Controller
 {
-    public function index($pet_owner_id)
+    public function index(Request $request, $pet_owner_id)
     {
         try {
+            // Obtener el número de resultados por página desde los parámetros de consulta o usar 20 por defecto
+            $perPage = $request->query('per_page', 20);
+    
+            // Validar que perPage sea un número entero positivo
+            if (!is_numeric($perPage) || $perPage <= 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The per_page parameter must be a positive integer.',
+                ], 400);
+            }
+    
             if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
                 // Si el usuario es un pet owner y está accediendo a sus propias mascotas
-                $pets = Pet::where('pet_owner_id', $pet_owner_id)->get();
-                return response()->json($pets);
+                $pets = Pet::where('pet_owner_id', $pet_owner_id)->paginate((int)$perPage);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
                 // Si el usuario es business owner o staff, permitir acceso a todas las mascotas
                 $pets = Pet::withTrashed()
                             ->where('pet_owner_id', $pet_owner_id)
-                            ->get();
-                return response()->json($pets);
+                            ->paginate((int)$perPage);
             } else {
                 // Otros casos, lanzar excepción de no autorizado
-                throw new UnauthorizedException('Unauthorized access.');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.',
+                ], 401);
             }
+    
+            return response()->json([
+                'status' => 'success',
+                'pets' => $pets,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
         }
     }
-
+    
 
     public function store(Request $request)
     {

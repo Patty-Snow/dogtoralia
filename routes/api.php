@@ -39,6 +39,7 @@ Route::prefix('pet_owner')->group(function () {
     Route::get('trashed', [PetOwnerController::class, 'trashed']);
     Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
     Route::post('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
+    Route::get('/index/{id}', [PetOwnerController::class, 'index']);
 });
 
 
@@ -87,6 +88,7 @@ Route::prefix('business_owner')->group(function () {
 //Route::middleware('auth:business_owner_api')->group(function () {
 Route::prefix('business')->group(function () {
     Route::get('/', [BusinessController::class, 'index']);
+    Route::get('/all', [BusinessController::class, 'indexAll']);
     Route::post('register', [BusinessController::class, 'store']);
     Route::get('/{id}', [BusinessController::class, 'show']);
     Route::put('/{id}', [BusinessController::class, 'update']);
