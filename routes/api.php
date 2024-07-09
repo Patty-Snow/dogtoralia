@@ -34,7 +34,6 @@ Route::prefix('pet_owner')->group(function () {
     Route::post('logout', [PetOwnerController::class, 'logout']);
 
     Route::get('/{id}', [PetOwnerController::class, 'show']);
-    Route::get('/{id}', [PetOwnerController::class, 'show']);
     Route::put('update', [PetOwnerController::class, 'update']);
     Route::delete('delete', [PetOwnerController::class, 'destroy']);
     Route::get('trashed', [PetOwnerController::class, 'trashed']);
@@ -74,7 +73,6 @@ Route::prefix('business_owner')->group(function () {
     Route::post('logout', [BusinessOwnerController::class, 'logout']);
 
     Route::get('/{id}', [BusinessOwnerController::class, 'show']);
-    Route::get('/{id}', [BusinessOwnerController::class, 'show']);
     Route::put('update', [BusinessOwnerController::class, 'update']);
     Route::delete('delete', [BusinessOwnerController::class, 'destroy']);
 
@@ -106,7 +104,6 @@ Route::prefix('staff')->group(function () {
     Route::post('login', [StaffController::class, 'login']);
     Route::post('refresh', [StaffController::class, 'refresh']);
     Route::post('logout', [StaffController::class, 'logout']);
-    Route::get('me', [StaffController::class, 'show']);
 
     Route::get('/', [StaffController::class, 'index']);
     Route::get('/{id}', [StaffController::class, 'show']);
