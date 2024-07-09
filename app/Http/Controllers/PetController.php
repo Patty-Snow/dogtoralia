@@ -45,10 +45,7 @@ class PetController extends Controller
                 'gender' => 'nullable|string|max:255',
             ]);
 
-            // Convertir la fecha al formato Y-m-d antes de guardar
-            if (isset($validatedData['birth_date'])) {
-                $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
-            }
+            
 
             // Agregar el pet_owner_id del usuario autenticado
             $validatedData['pet_owner_id'] = Auth::id();
@@ -102,11 +99,7 @@ class PetController extends Controller
                 'gender' => 'sometimes|string|max:255',
             ]);
 
-            // Convertir la fecha al formato Y-m-d antes de guardar
-            if (isset($validatedData['birth_date'])) {
-                $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
-            }
-
+            
             // Verificar que el pet pertenece al pet owner autenticado
             $pet = Pet::withTrashed()->where('id', $id)
                 ->where('pet_owner_id', Auth::id())
