@@ -34,6 +34,7 @@ Route::prefix('pet_owner')->group(function () {
     Route::post('logout', [PetOwnerController::class, 'logout']);
 
     Route::get('/{id}', [PetOwnerController::class, 'show']);
+    Route::get('/{id}', [PetOwnerController::class, 'show']);
     Route::put('update', [PetOwnerController::class, 'update']);
     Route::delete('delete', [PetOwnerController::class, 'destroy']);
     Route::get('trashed', [PetOwnerController::class, 'trashed']);
@@ -47,6 +48,7 @@ Route::prefix('pet_owner')->group(function () {
 
 Route::middleware('auth:pet_owner_api')->group(function () {
     Route::prefix('pets')->group(function () {
+        
         
         Route::post('/', [PetController::class, 'store'])->name('pets.store');
         Route::get('/{id}', [PetController::class, 'show'])->name('pets.show');
@@ -71,6 +73,7 @@ Route::prefix('business_owner')->group(function () {
     Route::post('refresh', [BusinessOwnerController::class, 'refresh']);
     Route::post('logout', [BusinessOwnerController::class, 'logout']);
 
+    Route::get('/{id}', [BusinessOwnerController::class, 'show']);
     Route::get('/{id}', [BusinessOwnerController::class, 'show']);
     Route::put('update', [BusinessOwnerController::class, 'update']);
     Route::delete('delete', [BusinessOwnerController::class, 'destroy']);

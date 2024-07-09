@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BusinessOwner;
 use Illuminate\Http\Request;
+use App\Models\BusinessOwner;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\UnauthorizedException;
 
 class BusinessOwnerController extends Controller
 {
@@ -172,14 +173,24 @@ class BusinessOwnerController extends Controller
         }
     }
 
-    public function show()
+    public function show($id)
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
+    
+            if ($businessOwner->id != $id) {
+                throw new UnauthorizedException('You are not authorized to view this profile.');
+            }
+    
             return response()->json([
                 'status' => 'success',
                 'user' => $businessOwner
             ]);
+        } catch (UnauthorizedException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

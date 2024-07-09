@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\UnauthorizedException;
 
 class PetOwnerController extends Controller
 {
@@ -193,6 +194,11 @@ class PetOwnerController extends Controller
                 'status' => 'success',
                 'user' => $petOwner
             ]);
+        } catch (UnauthorizedException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -201,6 +207,7 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
+
 
 
     public function update(Request $request)
