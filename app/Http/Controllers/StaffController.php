@@ -61,10 +61,10 @@ class StaffController extends Controller
     public function register(Request $request)
     {
         try {
+            // Validar la entrada básica
             $request->validate([
                 'name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
                 'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:staffs'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
@@ -75,22 +75,36 @@ class StaffController extends Controller
             ], [
                 'name.regex' => 'The name can only contain letters and spaces, including letters with accents.',
                 'last_name.regex' => 'The last name can only contain letters and spaces, including letters with accents.',
-                'email.unique' => 'The email has already been taken.',
                 'password.confirmed' => 'The password confirmation does not match.',
                 'phone_number.regex' => 'The phone number can only contain numbers and should be between 9 and 15 digits.',
                 'business_id.exists' => 'Invalid business ID.',
             ]);
 
+            // Validar que el correo electrónico sea único en las tres tablas
+            $email = $request->input('email');
+            $emailExistsInBusinessOwners = \App\Models\BusinessOwner::where('email', $email)->exists();
+            $emailExistsInPetOwners = \App\Models\PetOwner::where('email', $email)->exists();
+            $emailExistsInStaffs = \App\Models\Staff::where('email', $email)->exists();
+
+            if ($emailExistsInBusinessOwners || $emailExistsInPetOwners || $emailExistsInStaffs) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The email address is already taken.'
+                ], 422);
+            }
+
+            // Manejar la carga de la foto de perfil
             $profilePhotoPath = null;
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
 
+            // Crear el nuevo Staff
             $staff = Staff::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
                 'phone_number' => $request->phone_number,
-                'email' => $request->email,
+                'email' => $email,
                 'password' => Hash::make($request->password),
                 'profile_photo' => $profilePhotoPath,
                 'business_id' => $request->business_id,
@@ -115,6 +129,7 @@ class StaffController extends Controller
             ], 500);
         }
     }
+
 
 
     public function login(Request $request)

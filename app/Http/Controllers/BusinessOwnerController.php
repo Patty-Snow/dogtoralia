@@ -19,10 +19,10 @@ class BusinessOwnerController extends Controller
     public function register(Request $request)
     {
         try {
+            // Validar la entrada básica
             $request->validate([
                 'name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
                 'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'email' => ['required', 'string', 'email', 'unique:business_owners,email'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
@@ -37,21 +37,37 @@ class BusinessOwnerController extends Controller
                 'phone_number.regex' => 'Phone number can only contain numbers and should be between 9 and 15 digits.',
             ]);
 
+            // Validar que el correo electrónico sea único en las tres tablas
+            $email = $request->input('email');
+            $emailExistsInBusinessOwners = \App\Models\BusinessOwner::where('email', $email)->exists();
+            $emailExistsInPetOwners = \App\Models\PetOwner::where('email', $email)->exists();
+            $emailExistsInStaffs = \App\Models\Staff::where('email', $email)->exists();
+
+            if ($emailExistsInBusinessOwners || $emailExistsInPetOwners || $emailExistsInStaffs) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The email address is already taken.'
+                ], 422);
+            }
+
+            // Manejar la carga de la foto de perfil
             $profilePhotoPath = null;
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
 
+            // Crear el nuevo BusinessOwner
             $businessOwner = BusinessOwner::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
-                'email' => $request->email,
+                'email' => $email,
                 'password' => Hash::make($request->password),
                 'phone_number' => $request->phone_number,
                 'rfc' => $request->rfc,
                 'profile_photo' => $profilePhotoPath,
             ]);
 
+            // Iniciar sesión al nuevo usuario
             $token = Auth::guard('business_owner_api')->login($businessOwner);
             return response()->json([
                 'status' => 'success',
@@ -75,6 +91,7 @@ class BusinessOwnerController extends Controller
             ], 500);
         }
     }
+
 
 
     public function login(Request $request)
