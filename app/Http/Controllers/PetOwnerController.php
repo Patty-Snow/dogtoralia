@@ -8,21 +8,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\UnauthorizedException;
 
 class PetOwnerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore']]);
+        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
     }
 
     public function register(Request $request)
     {
         try {
+            // Validar la entrada básica
             $request->validate([
                 'name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
                 'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'email' => ['required', 'string', 'email', 'unique:pet_owners,email'],
                 'password' => [
                     'required', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
@@ -33,23 +34,39 @@ class PetOwnerController extends Controller
                 'name.regex' => 'Name can only contain letters and spaces.',
                 'last_name.regex' => 'Last name can only contain letters and spaces.',
                 'password.confirmed' => 'The password confirmation does not match.',
-                'phone_number.regex' => 'Phone number can only contain numbers and should be between 10 and 15 digits.',
+                'phone_number.regex' => 'Phone number can only contain numbers and should be between 9 and 15 digits.',
             ]);
 
+            // Validar que el correo electrónico sea único en las tres tablas
+            $email = $request->input('email');
+            $emailExistsInBusinessOwners = \App\Models\BusinessOwner::where('email', $email)->exists();
+            $emailExistsInPetOwners = \App\Models\PetOwner::where('email', $email)->exists();
+            $emailExistsInStaffs = \App\Models\Staff::where('email', $email)->exists();
+
+            if ($emailExistsInBusinessOwners || $emailExistsInPetOwners || $emailExistsInStaffs) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The email address is already taken.'
+                ], 422);
+            }
+
+            // Manejar la carga de la foto de perfil
             $profilePhotoPath = null;
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
 
+            // Crear el nuevo PetOwner
             $petOwner = PetOwner::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
-                'email' => $request->email,
+                'email' => $email,
                 'password' => Hash::make($request->password),
                 'phone_number' => $request->phone_number,
                 'profile_photo' => $profilePhotoPath,
             ]);
 
+            // Iniciar sesión al nuevo usuario
             $token = Auth::guard('pet_owner_api')->login($petOwner);
             return response()->json([
                 'status' => 'success',
@@ -73,6 +90,7 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
+
 
     public function login(Request $request)
     {
@@ -138,7 +156,7 @@ class PetOwnerController extends Controller
             return response()->json([
                 'status' => 'success',
                 'user' => Auth::guard('pet_owner_api')->user(),
-                'authorisation' => [
+                'authorization' => [
                     'token' => Auth::guard('pet_owner_api')->refresh(),
                     'type' => 'bearer',
                 ]
@@ -152,14 +170,35 @@ class PetOwnerController extends Controller
         }
     }
 
-    public function show()
+    public function show($pet_owner_id)
     {
         try {
-            $petOwner = Auth::guard('pet_owner_api')->user();
+            $authenticatedUser = Auth::user();
+
+            // Verificar si el usuario autenticado es el pet owner con el ID proporcionado
+            if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
+                $petOwner = Auth::guard('pet_owner_api')->user();
+            }
+            // Verificar si el usuario autenticado es un business owner o staff
+            elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+                $petOwner = PetOwner::findOrFail($pet_owner_id);
+            } else {
+                // Si no es un pet owner autenticado o un business owner/staff, lanzar excepción de no autorizado
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.',
+                ], 401);
+            }
+
             return response()->json([
                 'status' => 'success',
                 'user' => $petOwner
             ]);
+        } catch (UnauthorizedException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -168,6 +207,8 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
+
+
 
     public function update(Request $request)
     {
@@ -319,6 +360,44 @@ class PetOwnerController extends Controller
                 'message' => 'An error occurred while trying to fetch trashed profiles',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    public function index(Request $request)
+    {
+        try {
+            // Verificar si el usuario autenticado es un business owner o staff
+            if (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+                // Definir el número de resultados por página con un valor predeterminado de 20
+                $perPage = $request->query('per_page', 20);
+
+                // Obtener todos los PetOwners, incluidos los eliminados
+                $petOwners = PetOwner::withTrashed()->paginate($perPage);
+
+                // Log para depuración
+                \Log::info('Pet Owners Count: ' . $petOwners->count());
+
+                if ($petOwners->isEmpty()) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'No pet owners found.',
+                        'pet_owners' => $petOwners,
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'pet_owners' => $petOwners,
+                ]);
+            } else {
+                // Otros casos, lanzar excepción de no autorizado
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.',
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching pet owners: ' . $e->getMessage()], 500);
         }
     }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->string('gender')->nullable();
             $table->timestamps();
+            $table->softDeletes(); 
     
             $table->foreign('pet_owner_id')->references('id')->on('pet_owners')->onDelete('cascade');
         });
