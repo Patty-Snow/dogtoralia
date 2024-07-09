@@ -374,6 +374,17 @@ class PetOwnerController extends Controller
                 // Obtener todos los PetOwners, incluidos los eliminados
                 $petOwners = PetOwner::withTrashed()->paginate($perPage);
 
+                // Log para depuración
+                \Log::info('Pet Owners Count: ' . $petOwners->count());
+
+                if ($petOwners->isEmpty()) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'No pet owners found.',
+                        'pet_owners' => $petOwners,
+                    ]);
+                }
+
                 return response()->json([
                     'status' => 'success',
                     'pet_owners' => $petOwners,

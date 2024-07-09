@@ -39,9 +39,11 @@ Route::prefix('pet_owner')->group(function () {
     Route::get('trashed', [PetOwnerController::class, 'trashed']);
     Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
     Route::post('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
-    Route::get('/index/{id}', [PetOwnerController::class, 'index']);
+    Route::get('/index', [PetOwnerController::class, 'index']);
 });
-
+Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(function () {
+    Route::get('/pet_owners', [PetOwnerController::class, 'index']);
+});
 
 //Rutas para pets
 
