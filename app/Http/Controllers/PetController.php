@@ -15,18 +15,20 @@ use Illuminate\Validation\UnauthorizedException;
 
 class PetController extends Controller
 {
-    public function index($pet_owner_id)
+    public function index(Request $request, $pet_owner_id)
     {
         try {
+            $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
+    
             if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
                 // Si el usuario es un pet owner y está accediendo a sus propias mascotas
-                $pets = Pet::where('pet_owner_id', $pet_owner_id)->get();
+                $pets = Pet::where('pet_owner_id', $pet_owner_id)->paginate($perPage);
                 return response()->json($pets);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
                 // Si el usuario es business owner o staff, permitir acceso a todas las mascotas
                 $pets = Pet::withTrashed()
                     ->where('pet_owner_id', $pet_owner_id)
-                    ->get();
+                    ->paginate($perPage);
                 return response()->json($pets);
             } else {
                 // Otros casos, lanzar excepción de no autorizado
@@ -36,6 +38,7 @@ class PetController extends Controller
             return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
         }
     }
+    
 
 
     public function store(Request $request)
