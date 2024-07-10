@@ -25,20 +25,21 @@ use App\Http\Controllers\StaffScheduleController;
 
 
 //Rutas para Pet Owner
+Route::middleware('auth:pet_owner_api')->group(function () {
+    Route::prefix('pet_owner')->group(function () {
+        Route::post('register', [PetOwnerController::class, 'register']);
+        Route::post('login', [PetOwnerController::class, 'login']);
+        Route::post('refresh', [PetOwnerController::class, 'refresh']);
+        Route::post('logout', [PetOwnerController::class, 'logout']);
 
-Route::prefix('pet_owner')->group(function () {
-    Route::post('register', [PetOwnerController::class, 'register']);
-    Route::post('login', [PetOwnerController::class, 'login']);
-    Route::post('refresh', [PetOwnerController::class, 'refresh']);
-    Route::post('logout', [PetOwnerController::class, 'logout']);
-
-    Route::put('update', [PetOwnerController::class, 'update']);
-    Route::delete('delete', [PetOwnerController::class, 'destroy']);
-    Route::get('trashed', [PetOwnerController::class, 'trashed']);
-    Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
-    Route::post('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
-    Route::get('/index', [PetOwnerController::class, 'index']);
+        Route::put('update', [PetOwnerController::class, 'update']);
+        Route::delete('delete', [PetOwnerController::class, 'destroy']);
+        Route::get('trashed', [PetOwnerController::class, 'trashed']);
+        Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
+        Route::delete('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
+    });
 });
+
 Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(function () {
     Route::get('/pet_owners', [PetOwnerController::class, 'index']);
 });

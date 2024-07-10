@@ -13,10 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class PetOwnerController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
-    // }
+   
 
     public function register(Request $request)
     {
