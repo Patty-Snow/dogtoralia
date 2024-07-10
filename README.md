@@ -190,7 +190,7 @@
   - `per_page`: Número de items por página. Por ejemplo, `https://devs-devitm.com/api/businesses/all?per_page=5` devolverá 5 items por página.
 
 - **Registrar un nuevo negocio**
-  - **URL:** `https://devs-devitm.com/api/businesses`
+  - **URL:** `https://devs-devitm.com/api/business/register`
   - **Método:** `POST`
   - **Body:**
     ```json
