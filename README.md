@@ -16,7 +16,7 @@
     ```
 
 - **Login**
-  - **URL:** `https://devs-devitm.com//api/pet_owner/login`
+  - **URL:** `https://devs-devitm.com/api/pet_owner/login`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -35,11 +35,15 @@
   - **URL:** `https://devs-devitm.com/api/pet_owner/logout`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
+ 
+- **Obtener detalles de cuenta**
 
-- **Obtener detalles del dueño de mascota**
+  - **URL:** `https://devs-devitm.com/api/pet_owner/me`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
 
+- **Obtener detalles de un dueño de mascota**
 > [!NOTE]  
-> Un Pet Owner solo puede ver sus propios datos.
 > Los Business Owners y Staff pueden ver cualquier perfil de Pet Owner pero no podrán modificarlo
 
   - **URL:** `https://devs-devitm.com/api/pet_owner/{id}`
