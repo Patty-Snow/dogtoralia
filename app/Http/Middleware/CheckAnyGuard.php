@@ -17,6 +17,6 @@ class CheckAnyGuard
         }
 
         // Si ninguno de los guards coincide, retornar respuesta no autorizada
-        return response()->json(['message' => 'Unauthorized.'], 401);
+        return response()->json(['message' => 'Unauthorized access'], 401);
     }
 }

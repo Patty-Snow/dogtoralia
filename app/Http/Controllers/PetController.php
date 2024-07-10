@@ -19,7 +19,7 @@ class PetController extends Controller
     {
         try {
             $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
-    
+
             if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
                 // Si el usuario es un pet owner y está accediendo a sus propias mascotas
                 $pets = Pet::where('pet_owner_id', $pet_owner_id)->paginate($perPage);
@@ -38,7 +38,28 @@ class PetController extends Controller
             return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
         }
     }
+
+    public function indexAll(Request $request)
+    {
+        try {
+            $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
     
+           
+            $pets = Pet::paginate($perPage);
+    
+            if ($pets->isEmpty()) {
+                return response()->json(['message' => 'No pets found'], 404);
+            }
+    
+            return response()->json($pets);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
+        }
+    }
+    
+
+
+
 
 
     public function store(Request $request)
@@ -273,7 +294,7 @@ class PetController extends Controller
         try {
             // Buscar la mascota con SoftDeletes
             $pet = Pet::withTrashed()->findOrFail($pet_id);
-    
+
             // Si la mascota tiene una imagen asociada, eliminarla
             if ($pet->photo_id) {
                 $image = Image::find($pet->photo_id);
@@ -284,15 +305,13 @@ class PetController extends Controller
                     $image->delete();
                 }
             }
-    
+
             // Borrar permanentemente la mascota
             $pet->forceDelete();
-    
+
             return response()->json(['message' => 'Pet permanently deleted']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error deleting pet permanently: ' . $e->getMessage()], 500);
         }
     }
-    
-    
 }

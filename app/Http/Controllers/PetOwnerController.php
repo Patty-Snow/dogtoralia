@@ -15,6 +15,12 @@ class PetOwnerController extends Controller
 {
    
 
+    public function __construct()
+    {
+        $this->middleware('checkAnyGuard:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
+    }
+    
+
     public function register(Request $request)
     {
         try {
@@ -204,6 +210,14 @@ class PetOwnerController extends Controller
         }
     }
 
+    public function showMe()
+    {
+        $petOwner = Auth::guard('pet_owner_api')->user();
+        return response()->json([
+            'status' => 'success',
+            'user' => $petOwner
+        ]);
+    }
 
     public function update(Request $request)
     {

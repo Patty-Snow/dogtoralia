@@ -24,26 +24,27 @@ use App\Http\Controllers\StaffScheduleController;
 
 
 
-//Rutas para Pet Owner
-Route::middleware('auth:pet_owner_api')->group(function () {
-    Route::prefix('pet_owner')->group(function () {
-        Route::post('register', [PetOwnerController::class, 'register']);
-        Route::post('login', [PetOwnerController::class, 'login']);
-        Route::post('refresh', [PetOwnerController::class, 'refresh']);
-        Route::post('logout', [PetOwnerController::class, 'logout']);
-
-        Route::put('update', [PetOwnerController::class, 'update']);
-        Route::delete('delete', [PetOwnerController::class, 'destroy']);
-        Route::get('trashed', [PetOwnerController::class, 'trashed']);
-        Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
-        Route::delete('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
-    });
+// Agrupación para rutas de pet_owner que requieren auth:pet_owner_api
+Route::middleware('checkAnyGuard:pet_owner_api')->prefix('pet_owner')->group(function () {
+    Route::post('refresh', [PetOwnerController::class, 'refresh']);
+    Route::get('me', [PetOwnerController::class, 'showMe']);
+    Route::put('update', [PetOwnerController::class, 'update']);
+    Route::delete('delete', [PetOwnerController::class, 'destroy']);
+    Route::get('trashed', [PetOwnerController::class, 'trashed']);
+    Route::post('restore/{id}', [PetOwnerController::class, 'restore']);
+    Route::delete('force_delete/{id}', [PetOwnerController::class, 'forceDelete']);
 });
 
+// Rutas individuales para registro, login y logout
+Route::prefix('pet_owner')->group(function () {
+    Route::post('register', [PetOwnerController::class, 'register']);
+    Route::post('login', [PetOwnerController::class, 'login']);
+    Route::post('logout', [PetOwnerController::class, 'logout']);
+});
+
+// Agrupación para rutas de pet_owners accesibles por business_owner_api y staff_api
 Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(function () {
     Route::get('/pet_owners', [PetOwnerController::class, 'index']);
-});
-Route::middleware('checkAnyGuard:business_owner_api,staff_api,pet_owner_api')->group(function () {
     Route::get('/pet_owner/{id}', [PetOwnerController::class, 'show']);
 });
 
@@ -66,6 +67,15 @@ Route::middleware(['checkAnyGuard:pet_owner_api,business_owner_api,staff_api'])-
         Route::get('/index/{pet_owner_id}', [PetController::class, 'index'])->name('pets.index');
     });
 });
+Route::middleware(['checkAnyGuard:pet_owner_api,business_owner_api,staff_api'])->group(function () {
+    Route::get('pets/', [PetController::class, 'indexAll'])->name('pets.indexAll');
+});
+
+
+
+
+
+
 
 
 //Rutas para Business Owner
