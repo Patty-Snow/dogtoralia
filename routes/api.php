@@ -87,7 +87,7 @@ Route::prefix('business_owner')->group(function () {
     Route::post('refresh', [BusinessOwnerController::class, 'refresh']);
     Route::post('logout', [BusinessOwnerController::class, 'logout']);
 
-    Route::get('/{id}', [BusinessOwnerController::class, 'show']);
+    Route::get('/me', [BusinessOwnerController::class, 'show']);
     Route::put('update', [BusinessOwnerController::class, 'update']);
     Route::delete('delete', [BusinessOwnerController::class, 'destroy']);
 

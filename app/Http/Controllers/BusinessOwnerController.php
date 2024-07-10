@@ -173,24 +173,16 @@ class BusinessOwnerController extends Controller
         }
     }
 
-    public function show($id)
+ 
+    public function show()
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
-    
-            if ($businessOwner->id != $id) {
-                throw new UnauthorizedException('You are not authorized to view this profile.');
-            }
-    
+
             return response()->json([
                 'status' => 'success',
                 'user' => $businessOwner
             ]);
-        } catch (UnauthorizedException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -206,15 +198,15 @@ class BusinessOwnerController extends Controller
             $businessOwner = Auth::guard('business_owner_api')->user();
 
             $request->validate([
-                'name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'last_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'email' => ['required', 'string', 'email', 'unique:business_owners,email'],
+                'name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
+                'last_name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
+                'email' => ['sometimes', 'string', 'email', 'unique:business_owners,email'],
                 'password' => [
-                    'required', 'string', 'min:8', 'confirmed',
+                    'sometimes', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
-                'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
-                'rfc' => ['required', 'string', 'max:13'],
+                'phone_number' => ['sometimes', 'string', 'regex:/^[0-9]{9,15}$/'],
+                'rfc' => ['sometimes', 'string', 'max:13'],
                 'profile_photo' => ['nullable', 'image', 'max:2048'],
             ], [
                 'name.regex' => 'Name can only contain letters and spaces.',
