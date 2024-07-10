@@ -1,11 +1,12 @@
 <?php
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
+
 
 class Pet extends Model
 {
@@ -13,11 +14,17 @@ class Pet extends Model
 
 
     protected $fillable = [
-        'pet_owner_id', 'name', 'species', 'breed', 'birth_date', 'color', 'gender'
+        'pet_owner_id', 'name', 'species', 'breed', 'birth_date', 'color', 'gender', 'photo_id'
     ];
+
 
     public function owner()
     {
         return $this->belongsTo(PetOwner::class, 'pet_owner_id');
+    }
+
+    public function photo()
+    {
+        return $this->belongsTo(Image::class, 'photo_id');
     }
 }

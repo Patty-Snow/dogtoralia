@@ -45,22 +45,23 @@ Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(functio
     Route::get('/pet_owners', [PetOwnerController::class, 'index']);
 });
 
-//Rutas para pets
 
+// Rutas para pets (autenticación requerida para pet_owner_api)
 Route::middleware('auth:pet_owner_api')->group(function () {
     Route::prefix('pets')->group(function () {
-        
-        
         Route::post('/', [PetController::class, 'store'])->name('pets.store');
         Route::get('/{id}', [PetController::class, 'show'])->name('pets.show');
         Route::put('/{id}', [PetController::class, 'update'])->name('pets.update');
-        Route::delete('/{id}', [PetController::class, 'destroy'])->name('pets.destroy');
+        Route::delete('/{id}', [PetController::class, 'destroy'])->name('pets.destroy'); // Soft delete
+        Route::put('/restore/{id}', [PetController::class, 'restore'])->name('pets.restore'); // Restaurar pet
+        Route::delete('/delete/{id}', [PetController::class, 'forceDelete'])->name('pets.forceDelete'); // Restaurar pet
     });
 });
+
+// Rutas para listar pets (autenticación requerida para pet_owner_api, business_owner_api, staff_api)
 Route::middleware(['checkAnyGuard:pet_owner_api,business_owner_api,staff_api'])->group(function () {
     Route::prefix('pets')->group(function () {
         Route::get('/index/{pet_owner_id}', [PetController::class, 'index'])->name('pets.index');
-     
     });
 });
 

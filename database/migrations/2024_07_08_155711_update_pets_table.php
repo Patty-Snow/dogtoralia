@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->softDeletes(); // Agregar soft deletes
+            $table->softDeletes(); 
+            $table->unsignedBigInteger('photo_id')->nullable()->after('id');
+
+            // Adding the foreign key constraint
+            $table->foreign('photo_id')->references('id')->on('images')->onDelete('set null');
         });
     }
 
@@ -22,6 +26,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pets', function (Blueprint $table) {
+            $table->dropForeign(['photo_id']); // Eliminar restricción de clave externa
+            $table->dropColumn('photo_id');
             $table->dropSoftDeletes(); // Eliminar soft deletes
         });
     }
