@@ -170,7 +170,7 @@
 > [!NOTE]  
 > Solo se pueden listar los negocios propios, un Business Owner no puede listar los negocios de otro Business Owner
 
-  - **URL:** `https://devs-devitm.com/api/businesses`
+  - **URL:** `https://devs-devitm.com/api/business`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
     
@@ -178,7 +178,7 @@
 > [!NOTE]  
 > Este endpoint es para listar todos los negocios registrados en el sistema, no requiere autenticación
   
-  - **URL:** `https://devs-devitm.com/api/businesses/all`
+  - **URL:** `https://devs-devitm.com/api/business/all`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
@@ -203,12 +203,12 @@
     ```
 
 - **Obtener detalles de un negocio**
-  - **URL:** `https://devs-devitm.com/api/businesses/{id}`
+  - **URL:** `https://devs-devitm.com/api/business/{id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información de un negocio**
-  - **URL:** `https://devs-devitm.com/api/businesses/{id}`
+  - **URL:** `https://devs-devitm.com/api/business/{id}`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -218,22 +218,22 @@
     ```
 
 - **Eliminar un negocio**
-  - **URL:** `https://devs-devitm.com/api/businesses/{id}`
+  - **URL:** `https://devs-devitm.com/api/business/{id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
 - **Listar negocios eliminados**
-  - **URL:** `https://devs-devitm.com/api/businesses/trashed`
+  - **URL:** `https://devs-devitm.com/api/business/trashed`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Restaurar un negocio eliminado**
-  - **URL:** `https://devs-devitm.com/api/businesses/restore/{id}`
+  - **URL:** `https://devs-devitm.com/api/business/restore/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Eliminar permanentemente un negocio**
-  - **URL:** `https://devs-devitm.com/api/businesses/force_delete/{id}`
+  - **URL:** `https://devs-devitm.com/api/business/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
