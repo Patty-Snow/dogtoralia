@@ -1,16 +1,15 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetController;
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
 use App\Http\Controllers\StaffScheduleController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +32,6 @@ Route::prefix('pet_owner')->group(function () {
     Route::post('refresh', [PetOwnerController::class, 'refresh']);
     Route::post('logout', [PetOwnerController::class, 'logout']);
 
-    Route::get('/{id}', [PetOwnerController::class, 'show']);
     Route::put('update', [PetOwnerController::class, 'update']);
     Route::delete('delete', [PetOwnerController::class, 'destroy']);
     Route::get('trashed', [PetOwnerController::class, 'trashed']);
@@ -43,6 +41,9 @@ Route::prefix('pet_owner')->group(function () {
 });
 Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(function () {
     Route::get('/pet_owners', [PetOwnerController::class, 'index']);
+});
+Route::middleware('checkAnyGuard:business_owner_api,staff_api,pet_owner_api')->group(function () {
+    Route::get('/pet_owner/{id}', [PetOwnerController::class, 'show']);
 });
 
 

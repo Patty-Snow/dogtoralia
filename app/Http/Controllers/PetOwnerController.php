@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Support\Facades\Log;
 
 class PetOwnerController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:pet_owner_api', ['except' => ['login', 'register', 'refresh', 'trashed', 'restore', 'index', 'show']]);
+    // }
 
     public function register(Request $request)
     {
@@ -173,17 +174,20 @@ class PetOwnerController extends Controller
     public function show($pet_owner_id)
     {
         try {
-            $authenticatedUser = Auth::user();
-
             // Verificar si el usuario autenticado es el pet owner con el ID proporcionado
-            if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
+            if (Auth::guard('pet_owner_api')->check()) {
+                if (Auth::id() != $pet_owner_id) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unauthorized access.',
+                    ], 401);
+                }
                 $petOwner = Auth::guard('pet_owner_api')->user();
             }
             // Verificar si el usuario autenticado es un business owner o staff
             elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
                 $petOwner = PetOwner::findOrFail($pet_owner_id);
             } else {
-                // Si no es un pet owner autenticado o un business owner/staff, lanzar excepción de no autorizado
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.',
@@ -194,11 +198,6 @@ class PetOwnerController extends Controller
                 'status' => 'success',
                 'user' => $petOwner
             ]);
-        } catch (UnauthorizedException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 403);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -207,7 +206,6 @@ class PetOwnerController extends Controller
             ], 500);
         }
     }
-
 
 
     public function update(Request $request)
