@@ -153,11 +153,32 @@
 **** 
  
  ### Gestión de Negocios
+ 
+> [!IMPORTANT]  
+> Para gestionar los negocios debes estar autenticado como Business Owner
 
-- **Listar todos los negocios**
+- **Listar todos los negocios de un mismo dueño**
+> [!NOTE]  
+> Solo se pueden listar los negocios propios, un Business Owner no puede listar los negocios de otro Business Owner
+
   - **URL:** `https://devs-devitm.com/api/businesses`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
+    
+- **Listar todos los negocios**
+> [!NOTE]  
+> Este endpoint es para listar todos los negocios registrados en el sistema, no requiere autenticación
+  
+  - **URL:** `https://devs-devitm.com/api/businesses/all`
+  - **Método:** `GET`
+  - **Body:** *No requiere cuerpo*
+
+> [!TIP]
+> Estos endpoint permiten listar los negocios registrados con paginación. 
+- **Paginación:** Los resultados se devuelven de 20 en 20 items por página por defecto.
+- **Parámetros de consulta (`query params`):**
+  - `page`: Número de página para la paginación.
+  - `per_page`: Número de items por página. Por ejemplo, `https://devs-devitm.com/api/businesses/all?per_page=5` devolverá 5 items por página.
 
 - **Registrar un nuevo negocio**
   - **URL:** `https://devs-devitm.com/api/businesses`
@@ -210,6 +231,16 @@
 ****
 
 ### Gestión de Mascotas
+
+> [!IMPORTANT]  
+> Debes estar autenticado como Pet Owner para gestionar tus mascotas
+
+> [!TIP]
+> El siguiente endpoint permite listar todas las mascotas de un dueño en específico, puedes acceder como Pet Owner, Business Owner o Staff (Un Pet Owner solo puede listar a sus propias mascotas). 
+- **Paginación:** Los resultados se devuelven de 20 en 20 items por página por defecto.
+- **Parámetros de consulta (`query params`):**
+  - `page`: Número de página para la paginación.
+  - `per_page`: Número de items por página. Por ejemplo, `https://devs-devitm.com/api/pets/all?per_page=3` devolverá 3 items por página.
 
 - **Listar todas las mascotas**
   - **URL:** `https://devs-devitm.com/api/pets`
