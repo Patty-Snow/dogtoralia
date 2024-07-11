@@ -109,7 +109,7 @@ class PetController extends Controller
                 'birth_date' => 'nullable|date_format:d-m-Y',
                 'color' => 'nullable|string|max:255',
                 'gender' => 'nullable|string|max:255',
-                'image' => 'required|image|max:2028',
+                'image' => 'sometimes|image|max:2028',
                 'alt_text' => 'nullable|string|max:255'
             ]);
 
