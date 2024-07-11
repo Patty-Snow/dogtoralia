@@ -394,29 +394,6 @@
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
-- **Cierre de sesión de un staff**
-  - **URL:** `https://devs-devitm.com/api/staff/schedule`
-  - **Método:** `POST`
-  - **Body:** 
-        ```json
-    {
-      "schedule_hours": [
-        {
-            "day_name": "Monday",
-            "children": [
-                {"item": {"id": 3}},
-                {"item": {"id": 4}}
-            ]
-        },
-        {
-            "day_name": "Tuesday",
-            "children": [
-                {"item": {"id": 5}},
-                {"item": {"id": 6}}
-            ]
-        }
-    ]
-    }
-    ```
+
 
 
