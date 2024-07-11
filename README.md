@@ -257,6 +257,7 @@
   
 > [!NOTE]
 > El siguiente endpoint funciona para listar a todas las mascotas registradas en el sistema, debes estar autenticado como Business Owner o Staff (próximamente habrá un superusuario quien será quien pueda acceder a esta ruta).
+
 - **Listar todas las mascotas**
   - **URL:** `https://devs-devitm.com/api/pets`
   - **Método:** `GET`
@@ -284,6 +285,9 @@
   - **Body:** *No requiere cuerpo*
 
 
+> [!IMPORTANT]
+> El siguiente endpoint permite subir una foto de tu mascota. Puedes probarlo en Postman enviando el body como form-data, añadiendo el campo `image` como tipo File y además puedes añadir un texto alternativo para tu foto añadiendo el campo `alt_text`.
+
 - **Registrar una nueva mascota**
   - **URL:** `https://devs-devitm.com/api/pets`
   - **Método:** `POST`
@@ -298,6 +302,7 @@
       "gender": "Male"
     }
     ```
+  - **Imagen de ejemplo para registrar mascota usando el form-data** ![Ejemplo de Postman](postman_registrarMascota.png)
 
 - **Obtener detalles de una mascota**
   - **URL:** `https://devs-devitm.com/api/pets/{id}`
