@@ -57,6 +57,33 @@ class PetController extends Controller
         }
     }
     
+    public function myPets(Request $request)
+{
+    try {
+        $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
+
+        if (Auth::guard('pet_owner_api')->check()) {
+            // Obtener el ID del pet owner autenticado
+            $petOwnerId = Auth::id();
+
+            // Obtener todas las mascotas del pet owner autenticado con paginación
+            $pets = Pet::where('pet_owner_id', $petOwnerId)->paginate($perPage);
+
+            // Verificar si hay resultados
+            if ($pets->isEmpty()) {
+                return response()->json(['message' => 'No pets found for this pet owner'], 404);
+            }
+
+            return response()->json($pets);
+        } else {
+            // Otros casos, lanzar excepción de no autorizado
+            throw new UnauthorizedException('Unauthorized access.');
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
+    }
+}
+
 
 
 
