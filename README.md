@@ -1,7 +1,7 @@
 ### Autenticación para Dueños de Mascotas (Pet Owners)
 
 - **Registrar un nuevo dueño de mascota**
-  - **URL:** `https://devs-devitm.com//api/pet_owner/register`
+  - **URL:** `https://devs-devitm.com/api/pet_owner/register`
   - **Método:** `POST`
   - **Body:**
     ```json
