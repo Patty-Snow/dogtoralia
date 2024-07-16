@@ -22,4 +22,9 @@ class Business extends Model
     {
         return $this->belongsTo(BusinessOwner::class, 'business_owner_id');
     }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 }
