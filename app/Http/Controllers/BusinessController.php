@@ -40,6 +40,10 @@ class BusinessController extends Controller
 
             // Obtener los negocios con paginación
             $businesses = Business::where('business_owner_id', $businessOwner->id)->paginate((int)$perPage);
+            
+            $businesses->load(['services' => function ($query) {
+                $query->with('offer');
+            }]);
 
             return response()->json([
                 'status' => 'success',
