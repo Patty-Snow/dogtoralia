@@ -12,21 +12,13 @@ class ServiceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:business_owner_api')->except(['indexAll', 'show']);
+        $this->middleware('auth:business_owner_api')->except(['index', 'show']);
     }
 
     public function index(Request $request)
     {
         try {
-            $businessOwner = Auth::guard('business_owner_api')->user();
-
-            if (!$businessOwner) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthorized access. No authenticated business owner found.',
-                ], 401);
-            }
-
+            
             $perPage = $request->query('per_page', 20);
 
             if (!is_numeric($perPage) || $perPage <= 0) {
@@ -36,8 +28,7 @@ class ServiceController extends Controller
                 ], 400);
             }
 
-            $services = Service::whereHas('business', function ($query) use ($businessOwner) {
-                $query->where('business_owner_id', $businessOwner->id);
+            $services = Service::whereHas('business', function ($query) {
             })->with('offer')->paginate((int)$perPage);
 
             return response()->json([

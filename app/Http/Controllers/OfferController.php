@@ -12,33 +12,13 @@ class OfferController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:business_owner_api')->except(['indexAll', 'show']);
+        $this->middleware('auth:business_owner_api')->except(['index', 'show']);
     }
 
     public function index(Request $request)
     {
         try {
-            $businessOwner = Auth::guard('business_owner_api')->user();
-
-            if (!$businessOwner) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthorized access. No authenticated business owner found.',
-                ], 401);
-            }
-
-            $perPage = $request->query('per_page', 20);
-
-            if (!is_numeric($perPage) || $perPage <= 0) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The per_page parameter must be a positive integer.',
-                ], 400);
-            }
-
-            $offers = Offer::whereHas('service.business', function ($query) use ($businessOwner) {
-                $query->where('business_owner_id', $businessOwner->id);
-            })->paginate((int)$perPage);
+            $offers = Offer::with(['service.business'])->paginate((int)$request->query('per_page', 20));
 
             return response()->json([
                 'status' => 'success',
