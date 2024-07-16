@@ -138,20 +138,20 @@ Route::post('/get-address', [GeolocationController::class, 'getAddress']);
 
 //Rutas para servicios
 Route::group(['middleware' => ['auth:business_owner_api']], function () {
-    Route::get('/services', [ServiceController::class, 'index']);
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 });
 
+Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
 // Rutas para ofertas
-Route::group(['middleware' => ['auth:business_owner_api']], function () {
-    Route::get('/offers', [OfferController::class, 'index']); 
+Route::group(['middleware' => ['auth:business_owner_api']], function () { 
     Route::post('/offers', [OfferController::class, 'store']); 
     Route::put('/offers/{id}', [OfferController::class, 'update']); 
     Route::delete('/offers/{id}', [OfferController::class, 'destroy']); 
 });
 
+Route::get('/offers', [OfferController::class, 'index']); 
 Route::get('/offers/{id}', [OfferController::class, 'show']); 
