@@ -398,6 +398,126 @@
   - **URL:** `https://devs-devitm.com/api/staff/logout`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
+    
+## Controlador de Servicios
+
+> [!NOTE]  
+> Se requiere estar autenticado como dueño de negocio para registrar, actualizar o eliminar algun servicio.
+
+- **Listar servicios**
+
+    - **URL:** `https://devs-devitm.com/api/services`
+    - **Método:** `GET`
+    - **Body:** *No requiere cuerpo*
+
+- **Crear servicio**
+
+    - **URL:** `https://devs-devitm.com/api/services`
+    - **Método:** `POST`
+    - **Body:**
+
+    ```json
+    {
+        "name": "Baño para gatos",
+        "description": "Servicio de baño para gatos con productos hipoalergénicos.",
+        "price": 50.00,
+        "currency": "MXN",
+        "max_services_simultaneously": 2,
+        "duration": 60,
+        "business_id": 1
+    }
+    ```
+- **Mostrar detalles de un servicio**
+
+    - **URL:** `https://devs-devitm.com/api/services/{id}`
+    - **Método:** `GET`
+    - **Body:** *No requiere cuerpo*
+    - **Parámetros de ruta:**
+      - `id` (requerido): ID único del servicio del cual se desean obtener los detalles.
+
+- **Actualizar Servicio**
+
+    - **URL:** `https://devs-devitm.com/api/services/{id}`
+    - **Método:** `PUT`
+    - **Body:**
+
+```json
+{
+    "name": "Nuevo nombre del servicio",
+    "description": "Nueva descripción del servicio",
+    "price": 55.00,
+    "currency": "USD",
+    "max_services_simultaneously": 3,
+    "duration": 75
+}
+```
+- **Eliminar servicio**
+
+    - **URL:** `https://devs-devitm.com/api/services/{id}`
+    - **Método:** `DELETE`
+    - **Body:** *No requiere cuerpo*
+    - **Parámetros de ruta:**
+      - `id` (requerido): ID único del servicio que se desea eliminar.
+        
+## Controlador de ofertas
+
+> [!NOTE]  
+> Se requiere estar autenticado como dueño de negocio para registrar, actualizar o eliminar alguna oferta.
+
+- **Listar Ofertas**
+
+    - **URL:** `https://devs-devitm.com/api/offers`
+    - **Método:** `GET`
+    - **Body:** *No requiere cuerpo*
+
+- **Crear oferta**
+
+    - **URL:** `https://devs-devitm.com/api/offers`
+    - **Método:** `POST`
+    - **Body:**
+
+    ```json
+    {
+        "service_id": 1,
+        "discount_price": 45.00,
+        "start_date": "2024-07-16",
+        "end_date": "2024-07-30",
+        "description": "Descuento especial de verano"
+    }
+    ```
+
+- **Mostrar detalles de una oferta**
+
+    - **URL:** `https://devs-devitm.com/api/offers/{id}`
+    - **Método:** `GET`
+    - **Body:** *No requiere cuerpo*
+    - **Parámetros de ruta:**
+      - `id` (requerido): ID único de la oferta que se desea mostrar.
+
+- **Actualizar una oferta**
+
+    - **URL:** `https://devs-devitm.com/api/offers/{id}`
+    - **Método:** `PUT`
+    - **Body:**
+
+    ```json
+    {
+        "discount_price": 45.50,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "description": "Descuento especial de verano"
+    }
+    ```
+    
+- **Eliminar una oferta**
+
+    - **URL:** `https://devs-devitm.com/api/offers/{id}`
+    - **Método:** `DELETE`
+    - **Body:** *No requiere cuerpo*
+    
+    - **Parámetros de ruta:**
+      - `id` (requerido): ID único de la oferta que se desea eliminar.
+
 
 
 
