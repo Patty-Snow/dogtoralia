@@ -22,4 +22,9 @@ class Business extends Model
     {
         return $this->belongsTo(BusinessOwner::class, 'business_owner_id');
     }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class, 'business_id');
+    }
 }

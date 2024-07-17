@@ -175,40 +175,42 @@ class PetOwnerController extends Controller
     }
 
     public function show($pet_owner_id)
-    {
-        try {
-            // Verificar si el usuario autenticado es el pet owner con el ID proporcionado
-            if (Auth::guard('pet_owner_api')->check()) {
-                if (Auth::id() != $pet_owner_id) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Unauthorized access.',
-                    ], 401);
-                }
-                $petOwner = Auth::guard('pet_owner_api')->user();
-            }
-            // Verificar si el usuario autenticado es un business owner o staff
-            elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                $petOwner = PetOwner::findOrFail($pet_owner_id);
-            } else {
+{
+    try {
+        // Verificar si el usuario autenticado es el pet owner con el ID proporcionado
+        if (Auth::guard('pet_owner_api')->check()) {
+            if (Auth::id() != $pet_owner_id) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.',
                 ], 401);
             }
-
-            return response()->json([
-                'status' => 'success',
-                'user' => $petOwner
-            ]);
-        } catch (\Exception $e) {
+            $petOwner = Auth::guard('pet_owner_api')->user();
+            $petOwner->load('addresses'); // Cargar las direcciones asociadas al pet owner
+        }
+        // Verificar si el usuario autenticado es un business owner o staff
+        elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+            $petOwner = PetOwner::with('addresses')->findOrFail($pet_owner_id);
+        } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while trying to fetch the user data',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Unauthorized access.',
+            ], 401);
         }
+
+        return response()->json([
+            'status' => 'success',
+            'user' => $petOwner
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'An error occurred while trying to fetch the user data',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     public function showMe()
     {

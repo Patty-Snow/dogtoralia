@@ -49,6 +49,10 @@ Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(functio
 });
 
 
+// Ruta para agregar direcciones de pet owners
+Route::middleware('auth:pet_owner_api')->post('pet-owner/set-address', [GeolocationController::class, 'setAddressForPetOwner']);
+
+
 // Rutas para pets (autenticación requerida para pet_owner_api)
 Route::middleware('auth:pet_owner_api')->group(function () {
     Route::prefix('pets')->group(function () {
@@ -112,6 +116,8 @@ Route::prefix('business')->group(function () {
 });
 // });
 
+//Agregar dirección para un negocio
+Route::middleware('auth:business_owner_api')->post('set-address/{business_id}', [GeolocationController::class, 'setAddress']);
 
 // Rutas para Staff
 Route::prefix('staff')->group(function () {

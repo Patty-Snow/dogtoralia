@@ -38,9 +38,17 @@ class BusinessController extends Controller
                 ], 400);
             }
 
-            // Obtener los negocios con paginación
-            $businesses = Business::where('business_owner_id', $businessOwner->id)->paginate((int)$perPage);
+            // Obtener los negocios con paginación, incluyendo la relación 'address'
+            $businesses = Business::with('address')
+                ->where('business_owner_id', $businessOwner->id)
+                ->paginate((int)$perPage);
+            // Iterar sobre los negocios para agregar la dirección formateada si está disponible
+            foreach ($businesses as $business) {
+                $business->formatted_address = $business->address ? $business->address->formatted_address : null;
 
+                // Opcionalmente, eliminar la relación cargada para no incluirla en la respuesta final
+                unset($business->address);
+            }
             return response()->json([
                 'status' => 'success',
                 'businesses' => $businesses,
@@ -60,7 +68,7 @@ class BusinessController extends Controller
         try {
             // Obtener el número de resultados por página desde los parámetros de consulta o usar 20 por defecto
             $perPage = $request->query('per_page', 20);
-    
+
             // Validar que perPage sea un número entero positivo
             if (!is_numeric($perPage) || $perPage <= 0) {
                 return response()->json([
@@ -68,24 +76,21 @@ class BusinessController extends Controller
                     'message' => 'The per_page parameter must be a positive integer.',
                 ], 400);
             }
-    
-            // Obtener todos los negocios con paginación
-            $businesses = Business::paginate((int)$perPage);
-    
-            // Filtrar los datos de cada negocio para mostrar solo los campos deseados
-            $filteredBusinesses = $businesses->map(function ($business) {
-                return [
-                    'id' => $business->id,
-                    'name' => $business->name,
-                    'phone_number' => $business->phone_number,
-                    'email' => $business->email,
-                    'description' => $business->description,
-                ];
-            });
-    
+
+            // Obtener todos los negocios con paginación, incluyendo la relación 'address'
+            $businesses = Business::with('address')->paginate((int)$perPage);
+
+            // Iterar sobre los negocios para agregar la dirección formateada si está disponible
+            foreach ($businesses as $business) {
+                $business->formatted_address = $business->address ? $business->address->formatted_address : null;
+
+                // Opcionalmente, eliminar la relación cargada para no incluirla en la respuesta final
+                unset($business->address);
+            }
+
             return response()->json([
                 'status' => 'success',
-                'businesses' => $filteredBusinesses,
+                'businesses' => $businesses,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -95,7 +100,7 @@ class BusinessController extends Controller
             ], 500);
         }
     }
-    
+
 
     public function store(Request $request)
     {
@@ -149,7 +154,7 @@ class BusinessController extends Controller
         try {
             // Obtener el negocio por su ID
             $business = Business::findOrFail($id);
-    
+
             return response()->json([
                 'status' => 'success',
                 'business' => $business,
@@ -162,7 +167,7 @@ class BusinessController extends Controller
             ], 500);
         }
     }
-    
+
 
     public function update(Request $request, $id)
     {
