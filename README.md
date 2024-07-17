@@ -203,6 +203,16 @@
       "description": "A full-service veterinary clinic"
     }
     ```
+- **Agregar dirección a un negocio**
+  - **URL:** `https://devs-devitm.com/api/business/set-address/{business_id}`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+     "lat":21.1202882,
+     "lon":-86.9633669
+    }
+    ```
 
 - **Obtener detalles de un negocio**
   - **URL:** `https://devs-devitm.com/api/business/{id}`
