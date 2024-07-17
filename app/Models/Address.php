@@ -18,10 +18,16 @@ class Address extends Model
         'longitude',
         'formatted_address',
         'pet_owner_id',
+        'business_id'
     ];
 
-    public function petOwner()
+    public function businesses()
     {
-        return $this->belongsTo(PetOwner::class);
+        return $this->belongsToMany(Business::class, 'business_address');
+    }
+
+    public function petOwners()
+    {
+        return $this->belongsToMany(PetOwner::class, 'pet_owner_address');
     }
 }
