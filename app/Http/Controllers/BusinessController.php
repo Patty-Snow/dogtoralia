@@ -15,7 +15,7 @@ class BusinessController extends Controller
         $this->middleware('auth:business_owner_api')->except(['indexAll', 'show']);;
     }
 
-    public function index(Request $request)
+     public function index(Request $request)
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
@@ -38,10 +38,11 @@ class BusinessController extends Controller
                 ], 400);
             }
 
-            // Obtener los negocios con paginación, incluyendo la relación 'address'
-            $businesses = Business::with('address')
+            // Obtener los negocios con paginación, incluyendo las relaciones 'address' y 'services'
+            $businesses = Business::with(['address', 'services'])
                 ->where('business_owner_id', $businessOwner->id)
                 ->paginate((int)$perPage);
+
             // Iterar sobre los negocios para agregar la dirección formateada si está disponible
             foreach ($businesses as $business) {
                 $business->formatted_address = $business->address ? $business->address->formatted_address : null;
@@ -49,6 +50,7 @@ class BusinessController extends Controller
                 // Opcionalmente, eliminar la relación cargada para no incluirla en la respuesta final
                 unset($business->address);
             }
+
             return response()->json([
                 'status' => 'success',
                 'businesses' => $businesses,

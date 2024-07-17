@@ -9,6 +9,8 @@ use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
 use App\Http\Controllers\StaffScheduleController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\OfferController;
 
 
 /*
@@ -21,8 +23,6 @@ use App\Http\Controllers\StaffScheduleController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-
 
 // Agrupación para rutas de pet_owner que requieren auth:pet_owner_api
 Route::middleware('checkAnyGuard:pet_owner_api')->prefix('pet_owner')->group(function () {
@@ -76,12 +76,6 @@ Route::middleware(['checkAnyGuard:business_owner_api,staff_api'])->group(functio
 });
 
 
-
-
-
-
-
-
 //Rutas para Business Owner
 Route::prefix('business_owner')->group(function () {
     Route::post('register', [BusinessOwnerController::class, 'register']);
@@ -102,8 +96,6 @@ Route::prefix('business_owner')->group(function () {
 
 
 //Rutas para business
-
-
 
 //Route::middleware('auth:business_owner_api')->group(function () {
 Route::prefix('business')->group(function () {
@@ -149,3 +141,15 @@ Route::prefix('staff/schedules')->group(function () {
 //Rutas para formatear dirección a partir de coordenadas
 
 Route::post('/get-address', [GeolocationController::class, 'getAddress']);
+
+//Rutas para servicios
+Route::group(['middleware' => ['auth:business_owner_api']], function () {
+    Route::post('/services', [ServiceController::class, 'store']);
+    Route::put('/services/{id}', [ServiceController::class, 'update']);
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+});
+
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{id}', [ServiceController::class, 'show']);
+
+ 
