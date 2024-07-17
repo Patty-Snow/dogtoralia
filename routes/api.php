@@ -109,7 +109,6 @@ Route::prefix('business')->group(function () {
 // });
 
 //Agregar dirección para un negocio
-Route::middleware('auth:business_owner_api')->post('set-address/{business_id}', [GeolocationController::class, 'setAddress']);
 Route::middleware('auth:business_owner_api')->post('business/set-address/{business_id}', [GeolocationController::class, 'setAddress']);
 
 // Rutas para Staff
