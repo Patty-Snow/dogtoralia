@@ -14,6 +14,16 @@
       "phone_number": "1234567890"
     }
     ```
+- **Añadir dirección como dueño de mascota**
+  - **URL:** `https://devs-devitm.com/api/pet-owner/set-address`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+      "lat": 34.0944781,
+      "lon": -118.3559678
+    }
+    ```
 
 - **Login**
   - **URL:** `https://devs-devitm.com/api/pet_owner/login`
