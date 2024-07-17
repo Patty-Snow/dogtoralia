@@ -146,12 +146,4 @@ Route::group(['middleware' => ['auth:business_owner_api']], function () {
 Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
-// Rutas para ofertas
-Route::group(['middleware' => ['auth:business_owner_api']], function () { 
-    Route::post('/offers', [OfferController::class, 'store']); 
-    Route::put('/offers/{id}', [OfferController::class, 'update']); 
-    Route::delete('/offers/{id}', [OfferController::class, 'destroy']); 
-});
-
-Route::get('/offers', [OfferController::class, 'index']); 
-Route::get('/offers/{id}', [OfferController::class, 'show']); 
+ 

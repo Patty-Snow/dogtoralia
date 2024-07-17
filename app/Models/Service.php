@@ -16,13 +16,12 @@ class Service extends Model
         'currency',
         'max_services_simultaneously',
         'duration',
+        'category',
+        'discount_price',
+        'offer_start',
+        'offer_end',
         'business_id',
     ];
-
-    public function offer()
-    {
-        return $this->hasOne(Offer::class);
-    }
 
     public function business()
     {

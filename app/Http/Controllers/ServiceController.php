@@ -18,7 +18,6 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         try {
-            
             $perPage = $request->query('per_page', 20);
 
             if (!is_numeric($perPage) || $perPage <= 0) {
@@ -29,7 +28,7 @@ class ServiceController extends Controller
             }
 
             $services = Service::whereHas('business', function ($query) {
-            })->with('offer')->paginate((int)$perPage);
+            })->paginate((int)$perPage);
 
             return response()->json([
                 'status' => 'success',
@@ -54,6 +53,9 @@ class ServiceController extends Controller
                 'currency' => ['required', 'string', 'max:3'],
                 'max_services_simultaneously' => ['required', 'integer', 'gt:0'],
                 'duration' => ['required', 'integer', 'gt:1'],
+                'discount_price' => ['nullable', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+                'offer_start' => ['nullable', 'date'],
+                'offer_end' => ['nullable', 'date', 'after_or_equal:offer_start'],
                 'business_id' => ['required', 'exists:businesses,id'],
             ]);
 
@@ -69,6 +71,10 @@ class ServiceController extends Controller
                 'currency' => $request->currency,
                 'max_services_simultaneously' => $request->max_services_simultaneously,
                 'duration' => $request->duration,
+                'category' => $request->input('category', 'services'),
+                'discount_price' => $request->discount_price,
+                'offer_start' => $request->offer_start,
+                'offer_end' => $request->offer_end,
                 'business_id' => $business->id,
             ]);
 
@@ -95,7 +101,7 @@ class ServiceController extends Controller
     public function show($id)
     {
         try {
-            $service = Service::with('offer')->findOrFail($id);
+            $service = Service::findOrFail($id);
 
             return response()->json([
                 'status' => 'success',
@@ -121,10 +127,14 @@ class ServiceController extends Controller
             $request->validate([
                 'name' => ['sometimes', 'required', 'string', 'max:45'],
                 'description' => ['sometimes', 'required', 'string'],
-                'price' => ['sometimes', 'required', 'numeric'],
+                'price' => ['sometimes', 'required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
                 'currency' => ['sometimes', 'required', 'string', 'max:3'],
                 'max_services_simultaneously' => ['sometimes', 'required', 'integer', 'gt:0'],
                 'duration' => ['sometimes', 'required', 'integer', 'gt:1'],
+                'category' => ['sometimes', 'string', 'max:45'],
+                'discount_price' => ['sometimes', 'nullable', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+                'offer_start' => ['sometimes', 'nullable', 'date'],
+                'offer_end' => ['sometimes', 'nullable', 'date', 'after_or_equal:offer_start'],
             ]);
 
             if ($request->has('name')) {
@@ -149,6 +159,24 @@ class ServiceController extends Controller
 
             if ($request->has('duration')) {
                 $service->duration = $request->get('duration');
+            }
+
+            if ($request->has('category')) {
+                $service->category = $request->get('category') ?? 'services';
+            } else {
+                $service->category = 'services';
+            }
+
+            if ($request->has('discount_price')) {
+                $service->discount_price = $request->get('discount_price');
+            }
+
+            if ($request->has('offer_start')) {
+                $service->offer_start = $request->get('offer_start');
+            }
+
+            if ($request->has('offer_end')) {
+                $service->offer_end = $request->get('offer_end');
             }
 
             $service->save();

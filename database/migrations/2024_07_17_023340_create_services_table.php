@@ -16,6 +16,10 @@ class CreateServicesTable extends Migration
             $table->string('currency', 3);
             $table->integer('max_services_simultaneously');
             $table->integer('duration');
+            $table->string('category')->default('services'); // New field for category with default value
+            $table->decimal('discount_price', 10, 2)->nullable(); // New field for discount price
+            $table->dateTime('offer_start')->nullable(); // New field for offer start
+            $table->dateTime('offer_end')->nullable(); // New field for offer end
             $table->foreignId('business_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
