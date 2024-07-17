@@ -26,6 +26,7 @@ class Business extends Model
     public function address()
     {
         return $this->hasOne(Address::class, 'business_id');
+    }
 
     public function services()
     {
