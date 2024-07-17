@@ -22,12 +22,10 @@ class GeolocationController extends Controller
         $request->validate([
             'lat' => 'required|numeric',
             'lon' => 'required|numeric',
-            'references' => 'sometimes|nullable|string',
         ]);
 
         $lat = $request->input('lat');
         $lon = $request->input('lon');
-        $references = $request->input('references');
 
         // Validar que el business_id existe
         $business = Business::find($business_id);
@@ -71,7 +69,7 @@ class GeolocationController extends Controller
             }
 
             $direccion = $data['display_name'] ?? 'Address not found';
-            $addressComponents = $this->extractAddressComponents($data['address'], $references);
+            $addressComponents = $this->extractAddressComponents($data['address']);
 
             // Verificar si ya existe una dirección para este negocio
             $existingAddress = Address::where('business_id', $business_id)->first();
@@ -121,12 +119,10 @@ class GeolocationController extends Controller
         $request->validate([
             'lat' => 'required|numeric',
             'lon' => 'required|numeric',
-            'references' => 'sometimes|nullable|string',
         ]);
 
         $lat = $request->input('lat');
         $lon = $request->input('lon');
-        $references = $request->input('references');
 
         // Obtener el pet_owner autenticado
         $petOwner = Auth::guard('pet_owner_api')->user();
@@ -165,7 +161,7 @@ class GeolocationController extends Controller
             }
 
             $direccion = $data['display_name'] ?? 'Address not found';
-            $addressComponents = $this->extractAddressComponents($data['address'], $references);
+            $addressComponents = $this->extractAddressComponents($data['address']);
 
             // Crear una nueva dirección asociada al pet_owner
             $newAddress = Address::create([
@@ -191,10 +187,9 @@ class GeolocationController extends Controller
      * Extrae los componentes de dirección relevantes del objeto de dirección.
      *
      * @param array $address
-     * @param string|null $references
      * @return array
      */
-    private function extractAddressComponents($address, $references)
+    private function extractAddressComponents($address)
     {
         \Log::info('Address Components', $address);
 
@@ -202,7 +197,7 @@ class GeolocationController extends Controller
             'city' => $address['city'] ?? $address['town'] ?? $address['village'] ?? $address['municipality'] ?? $address['borough'] ?? $address['suburb'] ?? $address['neighbourhood'] ?? null,
             'state' => $address['state'] ?? $address['region'] ?? $address['state_district'] ?? $address['province'] ?? $address['county'] ?? null,
             'postal_code' => isset($address['postcode']) ? (string)$address['postcode'] : null, // Convertir a string
-            'references' => $references ?? null,
+            'references' => $address['road'] ?? $address['residential'] ?? $address['path'] ?? $address['pedestrian'] ?? null,
         ];
     }
 }
