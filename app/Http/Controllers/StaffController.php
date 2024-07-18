@@ -80,6 +80,18 @@ class StaffController extends Controller
                 'business_id.exists' => 'Invalid business ID.',
             ]);
 
+            // Validar que el business_id pertenezca al business owner autenticado
+            $businessOwner = Auth::guard('business_owner_api')->user();
+            $businessId = $request->input('business_id');
+            $business = Business::where('id', $businessId)->where('business_owner_id', $businessOwner->id)->first();
+
+            if (!$business) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The business ID does not belong to the authenticated business owner.',
+                ], 403);
+            }
+
             // Validar que el correo electrónico sea único en las tres tablas
             $email = $request->input('email');
             $emailExistsInBusinessOwners = \App\Models\BusinessOwner::where('email', $email)->exists();
@@ -129,6 +141,7 @@ class StaffController extends Controller
             ], 500);
         }
     }
+
 
 
 
