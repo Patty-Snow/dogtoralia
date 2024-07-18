@@ -354,12 +354,12 @@
   - **Body:** *No requiere cuerpo*
 
 - **Registrar un nuevo miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff`
+  - **URL:** `https://devs-devitm.com/api/staff/register`
   - **Método:** `POST`
   - **Body:**
     ```json
     {
-      "name": "Dr. Smith",
+      "name": "Dr Smith",
       "last_name": "Johnson",
       "email": "drsmith@dogtoralia.com",
       "password": "Password123!",
