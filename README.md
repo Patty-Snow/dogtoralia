@@ -354,7 +354,7 @@
   - **Body:** *No requiere cuerpo*
 
 - **Registrar un nuevo miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/register`
+  - **URL:** `https://devs-devitm.com/api/staff/register/{business_id}`
   - **Método:** `POST`
   - **Body:**
     ```json
