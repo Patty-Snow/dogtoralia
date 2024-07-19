@@ -15,7 +15,7 @@ class BusinessController extends Controller
         $this->middleware('auth:business_owner_api')->except(['indexAll', 'show']);;
     }
 
-     public function index(Request $request)
+    public function index(Request $request)
     {
         try {
             $businessOwner = Auth::guard('business_owner_api')->user();
@@ -154,12 +154,25 @@ class BusinessController extends Controller
     public function show($id)
     {
         try {
-            // Obtener el negocio por su ID
-            $business = Business::findOrFail($id);
+            // Obtener el negocio por su ID incluyendo la relación 'address'
+            $business = Business::with('address')->findOrFail($id);
+
+
+            $businessData = [
+                'id' => $business->id,
+                'name' => $business->name,
+                'phone_number' => $business->phone_number,
+                'email' => $business->email,
+                'formatted_address' => $business->address ? $business->address->formatted_address : null,
+                'description' => $business->description,
+                'profile_photo' => $business->profile_photo,
+                'created_at' => $business->created_at,
+                'updated_at' => $business->updated_at,
+            ];
 
             return response()->json([
                 'status' => 'success',
-                'business' => $business,
+                'business' => $businessData,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -169,6 +182,7 @@ class BusinessController extends Controller
             ], 500);
         }
     }
+
 
 
     public function update(Request $request, $id)

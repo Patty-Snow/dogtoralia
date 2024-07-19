@@ -57,8 +57,7 @@ class StaffController extends Controller
             ], 500);
         }
     }
-
-    public function register(Request $request)
+    public function register(Request $request, $business_id)
     {
         try {
             // Validar la entrada básica
@@ -71,46 +70,43 @@ class StaffController extends Controller
                 ],
                 'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,15}$/'],
                 'profile_photo' => ['nullable', 'image', 'max:2048'],
-                'business_id' => ['required', 'exists:businesses,id'],
             ], [
                 'name.regex' => 'The name can only contain letters and spaces, including letters with accents.',
                 'last_name.regex' => 'The last name can only contain letters and spaces, including letters with accents.',
                 'password.confirmed' => 'The password confirmation does not match.',
                 'phone_number.regex' => 'The phone number can only contain numbers and should be between 9 and 15 digits.',
-                'business_id.exists' => 'Invalid business ID.',
             ]);
-
+    
             // Validar que el business_id pertenezca al business owner autenticado
             $businessOwner = Auth::guard('business_owner_api')->user();
-            $businessId = $request->input('business_id');
-            $business = Business::where('id', $businessId)->where('business_owner_id', $businessOwner->id)->first();
-
+            $business = Business::where('id', $business_id)->where('business_owner_id', $businessOwner->id)->first();
+    
             if (!$business) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The business ID does not belong to the authenticated business owner.',
                 ], 403);
             }
-
+    
             // Validar que el correo electrónico sea único en las tres tablas
             $email = $request->input('email');
             $emailExistsInBusinessOwners = \App\Models\BusinessOwner::where('email', $email)->exists();
             $emailExistsInPetOwners = \App\Models\PetOwner::where('email', $email)->exists();
             $emailExistsInStaffs = \App\Models\Staff::where('email', $email)->exists();
-
+    
             if ($emailExistsInBusinessOwners || $emailExistsInPetOwners || $emailExistsInStaffs) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The email address is already taken.'
                 ], 422);
             }
-
+    
             // Manejar la carga de la foto de perfil
             $profilePhotoPath = null;
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
-
+    
             // Crear el nuevo Staff
             $staff = Staff::create([
                 'name' => $request->name,
@@ -119,9 +115,9 @@ class StaffController extends Controller
                 'email' => $email,
                 'password' => Hash::make($request->password),
                 'profile_photo' => $profilePhotoPath,
-                'business_id' => $request->business_id,
+                'business_id' => $business_id,
             ]);
-
+    
             return response()->json([
                 'status' => 'success',
                 'message' => 'Staff registered successfully',
@@ -141,6 +137,7 @@ class StaffController extends Controller
             ], 500);
         }
     }
+    
 
 
 
@@ -194,7 +191,6 @@ class StaffController extends Controller
             $request->validate([
                 'name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
                 'last_name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚüÜñÑ]+$/'],
-                'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:staffs'],
                 'password' => [
                     'sometimes', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
@@ -205,7 +201,6 @@ class StaffController extends Controller
             ], [
                 'name.regex' => 'The name can only contain letters and spaces, including letters with accents.',
                 'last_name.regex' => 'The last name can only contain letters and spaces, including letters with accents.',
-                'email.unique' => 'The email has already been taken.',
                 'password.confirmed' => 'The password confirmation does not match.',
                 'phone_number.regex' => 'The phone number can only contain numbers and should be between 9 and 15 digits.',
                 'business_id.exists' => 'Invalid business ID.',
@@ -232,9 +227,6 @@ class StaffController extends Controller
                 $staff->phone_number = $request->phone_number;
             }
 
-            if ($request->has('email')) {
-                $staff->email = $request->email;
-            }
 
             if ($request->has('password')) {
                 $staff->password = Hash::make($request->password);

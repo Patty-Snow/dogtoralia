@@ -113,7 +113,7 @@ Route::middleware('auth:business_owner_api')->post('business/set-address/{busine
 
 // Rutas para Staff
 Route::prefix('staff')->group(function () {
-    Route::post('register', [StaffController::class, 'register']);
+    Route::post('register/{business_id}', [StaffController::class, 'register']);
     Route::post('login', [StaffController::class, 'login']);
     Route::post('refresh', [StaffController::class, 'refresh']);
     Route::post('logout', [StaffController::class, 'logout']);
