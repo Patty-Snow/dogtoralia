@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\UnauthorizedException;
 
@@ -18,83 +17,65 @@ class PetController extends Controller
     public function index(Request $request, $pet_owner_id)
     {
         try {
-            $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
+            $perPage = $request->query('per_page', 20);
 
             if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
-                // Si el usuario es un pet owner y está accediendo a sus propias mascotas
                 $pets = Pet::where('pet_owner_id', $pet_owner_id)->paginate($perPage);
-                return response()->json($pets);
+                return response()->json(['status' => 'success', 'pets' => $pets]);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                // Si el usuario es business owner o staff, permitir acceso a todas las mascotas
-                $pets = Pet::withTrashed()
-                    ->where('pet_owner_id', $pet_owner_id)
-                    ->paginate($perPage);
-                return response()->json($pets);
+                $pets = Pet::withTrashed()->where('pet_owner_id', $pet_owner_id)->paginate($perPage);
+                return response()->json(['status' => 'success', 'pets' => $pets]);
             } else {
-                // Otros casos, lanzar excepción de no autorizado
                 throw new UnauthorizedException('Unauthorized access.');
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
     }
 
     public function indexAll(Request $request)
     {
         try {
-            $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
-    
-           
+            $perPage = $request->query('per_page', 20);
             $pets = Pet::paginate($perPage);
-    
+
             if ($pets->isEmpty()) {
-                return response()->json(['message' => 'No pets found'], 404);
+                return response()->json(['status' => 'error', 'message' => 'No pets found'], 404);
             }
-    
-            return response()->json($pets);
+
+            return response()->json(['status' => 'success', 'pets' => $pets]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
     }
-    
+
     public function myPets(Request $request)
-{
-    try {
-        $perPage = $request->query('per_page', 20); // Obtener el parámetro per_page de la consulta, o usar 20 por defecto
+    {
+        try {
+            $perPage = $request->query('per_page', 20);
 
-        if (Auth::guard('pet_owner_api')->check()) {
-            // Obtener el ID del pet owner autenticado
-            $petOwnerId = Auth::id();
+            if (Auth::guard('pet_owner_api')->check()) {
+                $petOwnerId = Auth::id();
+                $pets = Pet::where('pet_owner_id', $petOwnerId)->paginate($perPage);
 
-            // Obtener todas las mascotas del pet owner autenticado con paginación
-            $pets = Pet::where('pet_owner_id', $petOwnerId)->paginate($perPage);
+                if ($pets->isEmpty()) {
+                    return response()->json(['status' => 'error', 'message' => 'No pets found for this pet owner'], 404);
+                }
 
-            // Verificar si hay resultados
-            if ($pets->isEmpty()) {
-                return response()->json(['message' => 'No pets found for this pet owner'], 404);
+                return response()->json(['status' => 'success', 'pets' => $pets]);
+            } else {
+                throw new UnauthorizedException('Unauthorized access.');
             }
-
-            return response()->json($pets);
-        } else {
-            // Otros casos, lanzar excepción de no autorizado
-            throw new UnauthorizedException('Unauthorized access.');
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error fetching pets: ' . $e->getMessage()], 500);
     }
-}
-
-
-
-
-
 
     public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
-            // Validación de la solicitud
             $validatedData = $request->validate([
                 'name' => [
                     'required',
@@ -113,12 +94,10 @@ class PetController extends Controller
                 'alt_text' => 'nullable|string|max:255'
             ]);
 
-            // Convertir la fecha de nacimiento al formato Y-m-d
             if (!empty($validatedData['birth_date'])) {
                 $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
             }
 
-            // Manejo de la carga de imagen
             if ($request->hasFile('image')) {
                 $fileName = time() . '_' . $request->image->getClientOriginalName();
                 $filePath = $request->image->storeAs('pet_images', $fileName, 'public');
@@ -128,29 +107,19 @@ class PetController extends Controller
                 $image->alt_text = $request->alt_text;
                 $image->save();
 
-                // Asignar el ID de la imagen a la mascota
                 $validatedData['photo_id'] = $image->id;
             }
 
-            // Agregar el pet_owner_id del usuario autenticado
             $validatedData['pet_owner_id'] = Auth::id();
-
-            // Crear la mascota
             $pet = Pet::create($validatedData);
-
-            // Formatear la fecha de nacimiento para la respuesta JSON
             $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
 
-            // Confirmar la transacción
             DB::commit();
 
-            // Devolver la respuesta JSON con la mascota creada
-            return response()->json($pet, 201);
+            return response()->json(['status' => 'success', 'pet' => $pet]);
         } catch (\Exception $e) {
-            // Revertir la transacción
             DB::rollBack();
-
-            return response()->json(['error' => 'Error creating pet: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error creating pet', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -158,36 +127,29 @@ class PetController extends Controller
     {
         try {
             if (Auth::guard('pet_owner_api')->check()) {
-                // Obtener la mascota por su ID, incluyendo las eliminadas
                 $pet = Pet::withTrashed()->findOrFail($pet_id);
 
-                // Verificar si el pet pertenece al pet owner autenticado
                 if ($pet->pet_owner_id != Auth::id()) {
                     throw new UnauthorizedException('You do not have permission to access this resource.');
                 }
 
-                return response()->json($pet);
+                return response()->json(['status' => 'success', 'pet' => $pet]);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                // Si el usuario es business owner o staff, permitir acceso a todas las mascotas
                 $pet = Pet::withTrashed()->findOrFail($pet_id);
-
-                return response()->json($pet);
+                return response()->json(['status' => 'success', 'pet' => $pet]);
             } else {
-                // Otros casos, lanzar excepción de no autorizado
                 throw new UnauthorizedException('Unauthorized access.');
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching pet: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error fetching pet', 'error' => $e->getMessage()], 500);
         }
     }
-
 
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
 
         try {
-            // Validación de la solicitud
             $validatedData = $request->validate([
                 'name' => [
                     'sometimes',
@@ -206,23 +168,17 @@ class PetController extends Controller
                 'alt_text' => 'sometimes|string|max:255'
             ]);
 
-            // Verificar que el pet pertenece al pet owner autenticado
-            $pet = Pet::withTrashed()->where('id', $id)
-                ->where('pet_owner_id', Auth::id())
-                ->first();
+            $pet = Pet::withTrashed()->where('id', $id)->where('pet_owner_id', Auth::id())->first();
 
             if (!$pet) {
-                return response()->json(['error' => 'Pet not found or you do not have permission to update this pet.'], 404);
+                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to update this pet.'], 404);
             }
 
-            // Convertir la fecha de nacimiento al formato Y-m-d
             if (!empty($validatedData['birth_date'])) {
                 $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
             }
 
-            // Manejo de la carga de imagen
             if ($request->hasFile('image')) {
-                // Eliminar la imagen anterior si existe
                 if ($pet->photo_id) {
                     $oldImage = Image::find($pet->photo_id);
                     if ($oldImage) {
@@ -231,7 +187,6 @@ class PetController extends Controller
                     }
                 }
 
-                // Guardar la nueva imagen
                 $fileName = time() . '_' . $request->image->getClientOriginalName();
                 $filePath = $request->image->storeAs('pet_images', $fileName, 'public');
 
@@ -240,105 +195,51 @@ class PetController extends Controller
                 $image->alt_text = $request->alt_text;
                 $image->save();
 
-                // Asignar el ID de la imagen a la mascota
                 $validatedData['photo_id'] = $image->id;
             }
 
-            // Actualizar los datos del pet
             $pet->update($validatedData);
 
-            // Confirmar la transacción
             DB::commit();
 
-            // Devolver la respuesta JSON con la mascota actualizada
-            return response()->json($pet);
+            return response()->json(['status' => 'success', 'pet' => $pet]);
         } catch (\Exception $e) {
-            // Revertir la transacción
             DB::rollBack();
-
-            return response()->json(['error' => 'Error updating pet: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error updating pet', 'error' => $e->getMessage()], 500);
         }
     }
-
-
-
-
 
     public function destroy($id)
     {
         try {
-            // Verificar que el pet pertenece al pet owner autenticado
-            $pet = Pet::where('id', $id)
-                ->where('pet_owner_id', Auth::id())
-                ->first();
+            $pet = Pet::where('id', $id)->where('pet_owner_id', Auth::id())->first();
 
             if (!$pet) {
-                return response()->json(['error' => 'Pet not found or you do not have permission to delete this pet.'], 404);
+                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to delete this pet.'], 404);
             }
 
-            // Eliminar el pet (soft delete)
             $pet->delete();
 
-            return response()->json(['message' => 'Pet deleted successfully']);
+            return response()->json(['status' => 'success', 'message' => 'Pet deleted successfully']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error deleting pet: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error deleting pet', 'error' => $e->getMessage()], 500);
         }
     }
 
-    public function trashed()
+    public function restore($id)
     {
         try {
-            if (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                // Permitir acceso a las mascotas eliminadas solo para business owners y staff
-                $pets = Pet::onlyTrashed()->get();
-                return response()->json($pets);
-            } else {
-                throw new UnauthorizedException('Unauthorized access.');
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching trashed pets: ' . $e->getMessage()], 500);
-        }
-    }
+            $pet = Pet::withTrashed()->where('id', $id)->where('pet_owner_id', Auth::id())->first();
 
-    public function restore($pet_id)
-    {
-        try {
-            // Verificar si el usuario es business owner o staff
-            if (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                $pet = Pet::withTrashed()->findOrFail($pet_id);
-                $pet->restore();
-                return response()->json(['message' => 'Pet restored successfully']);
-            } else {
-                throw new UnauthorizedException('Unauthorized access.');
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error restoring pet: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function forceDelete($pet_id)
-    {
-        try {
-            // Buscar la mascota con SoftDeletes
-            $pet = Pet::withTrashed()->findOrFail($pet_id);
-
-            // Si la mascota tiene una imagen asociada, eliminarla
-            if ($pet->photo_id) {
-                $image = Image::find($pet->photo_id);
-                if ($image) {
-                    // Eliminar el archivo de imagen del almacenamiento
-                    Storage::disk('public')->delete($image->source_url);
-                    // Eliminar el registro de la imagen
-                    $image->delete();
-                }
+            if (!$pet) {
+                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to restore this pet.'], 404);
             }
 
-            // Borrar permanentemente la mascota
-            $pet->forceDelete();
+            $pet->restore();
 
-            return response()->json(['message' => 'Pet permanently deleted']);
+            return response()->json(['status' => 'success', 'message' => 'Pet restored successfully']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error deleting pet permanently: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Error restoring pet', 'error' => $e->getMessage()], 500);
         }
     }
 }
