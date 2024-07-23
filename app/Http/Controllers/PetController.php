@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Support\Facades\Log;
+
 
 class PetController extends Controller
 {
@@ -21,13 +23,18 @@ class PetController extends Controller
 
             if (Auth::guard('pet_owner_api')->check() && Auth::id() == $pet_owner_id) {
                 $pets = Pet::where('pet_owner_id', $pet_owner_id)->paginate($perPage);
-                return response()->json(['status' => 'success', 'pets' => $pets]);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
                 $pets = Pet::withTrashed()->where('pet_owner_id', $pet_owner_id)->paginate($perPage);
-                return response()->json(['status' => 'success', 'pets' => $pets]);
             } else {
                 throw new UnauthorizedException('Unauthorized access.');
             }
+
+            // Formatear la fecha de nacimiento
+            foreach ($pets as $pet) {
+                $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+            }
+
+            return response()->json(['status' => 'success', 'pets' => $pets]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
@@ -41,6 +48,11 @@ class PetController extends Controller
 
             if ($pets->isEmpty()) {
                 return response()->json(['status' => 'error', 'message' => 'No pets found'], 404);
+            }
+
+            // Formatear la fecha de nacimiento
+            foreach ($pets as $pet) {
+                $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
             }
 
             return response()->json(['status' => 'success', 'pets' => $pets]);
@@ -62,12 +74,41 @@ class PetController extends Controller
                     return response()->json(['status' => 'error', 'message' => 'No pets found for this pet owner'], 404);
                 }
 
+                // Formatear la fecha de nacimiento
+                foreach ($pets as $pet) {
+                    $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+                }
+
                 return response()->json(['status' => 'success', 'pets' => $pets]);
             } else {
                 throw new UnauthorizedException('Unauthorized access.');
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function show($pet_id)
+    {
+        try {
+            if (Auth::guard('pet_owner_api')->check()) {
+                $pet = Pet::withTrashed()->findOrFail($pet_id);
+
+                if ($pet->pet_owner_id != Auth::id()) {
+                    throw new UnauthorizedException('You do not have permission to access this resource.');
+                }
+            } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+                $pet = Pet::withTrashed()->findOrFail($pet_id);
+            } else {
+                throw new UnauthorizedException('Unauthorized access.');
+            }
+
+            // Formatear la fecha de nacimiento
+            $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+
+            return response()->json(['status' => 'success', 'pet' => $pet]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error fetching pet', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -123,27 +164,7 @@ class PetController extends Controller
         }
     }
 
-    public function show($pet_id)
-    {
-        try {
-            if (Auth::guard('pet_owner_api')->check()) {
-                $pet = Pet::withTrashed()->findOrFail($pet_id);
 
-                if ($pet->pet_owner_id != Auth::id()) {
-                    throw new UnauthorizedException('You do not have permission to access this resource.');
-                }
-
-                return response()->json(['status' => 'success', 'pet' => $pet]);
-            } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                $pet = Pet::withTrashed()->findOrFail($pet_id);
-                return response()->json(['status' => 'success', 'pet' => $pet]);
-            } else {
-                throw new UnauthorizedException('Unauthorized access.');
-            }
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Error fetching pet', 'error' => $e->getMessage()], 500);
-        }
-    }
 
     public function update(Request $request, $id)
     {
@@ -226,6 +247,48 @@ class PetController extends Controller
         }
     }
 
+    public function trashed(Request $request)
+{
+    try {
+        $perPage = $request->query('per_page', 20);
+
+        if (Auth::guard('pet_owner_api')->check()) {
+            Log::info('Pet owner authenticated. Fetching pets for owner ID.', ['id' => Auth::id()]);
+            $pets = Pet::onlyTrashed()->where('pet_owner_id', Auth::id())->paginate($perPage);
+        } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
+            Log::info('Business or staff authenticated.');
+            $pets = Pet::onlyTrashed()->paginate($perPage);
+        } else {
+            throw new UnauthorizedException('Unauthorized access.');
+        }
+
+        if ($pets->isEmpty()) {
+            return response()->json(['status' => 'error', 'message' => 'No trashed pets found'], 404);
+        }
+
+        // Formatear la fecha de nacimiento
+        foreach ($pets as $pet) {
+            if ($pet->birth_date) {
+                $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+            }
+        }
+
+        return response()->json(['status' => 'success', 'pets' => $pets]);
+    } catch (\Exception $e) {
+        Log::error('Error fetching trashed pets.', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return response()->json(['status' => 'error', 'message' => 'Error fetching trashed pets', 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
+    }
+}
+
+    
+
+
+
+
     public function restore($id)
     {
         try {
@@ -240,6 +303,31 @@ class PetController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Pet restored successfully']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error restoring pet', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $pet = Pet::withTrashed()->where('id', $id)->where('pet_owner_id', Auth::id())->first();
+
+            if (!$pet) {
+                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to delete this pet permanently.'], 404);
+            }
+
+            if ($pet->photo_id) {
+                $image = Image::find($pet->photo_id);
+                if ($image) {
+                    Storage::disk('public')->delete($image->source_url);
+                    $image->delete();
+                }
+            }
+
+            $pet->forceDelete();
+
+            return response()->json(['status' => 'success', 'message' => 'Pet permanently deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error deleting pet permanently', 'error' => $e->getMessage()], 500);
         }
     }
 }
