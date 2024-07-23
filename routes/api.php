@@ -63,6 +63,7 @@ Route::middleware('auth:pet_owner_api')->group(function () {
         Route::delete('/{id}', [PetController::class, 'destroy'])->name('pets.destroy'); // Soft delete
         Route::put('/restore/{id}', [PetController::class, 'restore'])->name('pets.restore'); // Restaurar pet
         Route::delete('/delete/{id}', [PetController::class, 'forceDelete'])->name('pets.forceDelete'); // Borrar permanentemente
+        Route::get('/trashed/index', [PetController::class, 'trashed'])->name('pets.trashed'); // Listar pets eliminados con soft delete
     });
 });
 
