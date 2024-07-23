@@ -23,3 +23,4 @@ class CreateOffersTable extends Migration
         Schema::dropIfExists('offers');
     }
 }
+
