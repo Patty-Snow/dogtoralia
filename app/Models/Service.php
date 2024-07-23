@@ -17,9 +17,6 @@ class Service extends Model
         'max_services_simultaneously',
         'duration',
         'category',
-        'discount_price',
-        'offer_start',
-        'offer_end',
         'business_id',
     ];
 
@@ -27,5 +24,9 @@ class Service extends Model
     {
         return $this->belongsTo(Business::class, 'business_id');
     }
-    
+
+    public function offer()
+    {
+        return $this->hasOne(Offer::class);
+    }
 }
