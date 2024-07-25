@@ -3,14 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetController;
 
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\PetOwnerController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
 use App\Http\Controllers\StaffScheduleController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\OfferController;
 use App\Http\Controllers\BusinessScheduleController;
 
 /*
@@ -149,9 +150,14 @@ Route::get('/services/{id}', [ServiceController::class, 'show']);
 // Rutas para horarios de negocios
 Route::group(['middleware' => ['auth:business_owner_api']], function () {
     Route::post('/business/schedule', [BusinessScheduleController::class, 'store']);
-    Route::put('/business/{businessId}/schedule', [BusinessScheduleController::class, 'update']);
+    Route::put('/business/schedule/{schedule_id}', [BusinessScheduleController::class, 'update']);
     Route::delete('/business/{businessId}/schedule', [BusinessScheduleController::class, 'destroy']);
 });
 
 Route::get('/business/{businessId}/schedule', [BusinessScheduleController::class, 'show']);
 
+// Rutas para gestionar citas
+
+Route::get('/services/availability/{service_id}', [AppointmentController::class, 'checkAvailability']);// Ruta para verificar la disponibilidad de un servicio en una fecha específica
+Route::post('/appointments', [AppointmentController::class, 'store']);// Ruta para crear una nueva cita
+Route::get('/appointments', [AppointmentController::class, 'index']);// Ruta para obtener las citas del propietario de mascotas autenticado

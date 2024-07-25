@@ -1,18 +1,19 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class UpdateAddressesTable extends Migration
 {
     public function up()
     {
         Schema::table('addresses', function (Blueprint $table) {
-            // Eliminar la clave foránea antes de hacer cambios
+            // Eliminar la clave foránea de pet_owner_id antes de hacer cambios
             $table->dropForeign(['pet_owner_id']);
 
-            // Cambiar el tipo de columna de postal_code a string
+            // Hacer nullable el campo postal_code
             $table->string('postal_code')->nullable()->change();
 
             // Hacer nullable el campo pet_owner_id
@@ -30,16 +31,18 @@ class UpdateAddressesTable extends Migration
     public function down()
     {
         Schema::table('addresses', function (Blueprint $table) {
+
             // Eliminar la clave foránea de business_id
             $table->dropForeign(['business_id']);
 
             // Eliminar la clave foránea de pet_owner_id
             $table->dropForeign(['pet_owner_id']);
-
-            // Revertir el cambio de postal_code a string
+            // Vaciar la tabla antes de revertir los cambios
+            DB::table('addresses')->truncate();
+            // Revertir el cambio de postal_code a no nullable
             $table->string('postal_code')->nullable(false)->change();
 
-            // Revertir el cambio de pet_owner_id a nullable false
+            // Revertir el cambio de pet_owner_id a no nullable
             $table->unsignedBigInteger('pet_owner_id')->nullable(false)->change();
 
             // Eliminar la columna business_id
