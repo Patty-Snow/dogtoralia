@@ -115,7 +115,7 @@ class PetController extends Controller
     public function store(Request $request)
     {
         DB::beginTransaction();
-
+    
         try {
             $validatedData = $request->validate([
                 'name' => [
@@ -134,32 +134,46 @@ class PetController extends Controller
                 'image' => 'sometimes|image|max:2028',
                 'alt_text' => 'nullable|string|max:255'
             ]);
-
+    
+            Log::info('Validated data:', $validatedData);
+    
             if (!empty($validatedData['birth_date'])) {
                 $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
             }
-
+    
             if ($request->hasFile('image')) {
+                Log::info('Image file is present.');
                 $fileName = time() . '_' . $request->image->getClientOriginalName();
+                Log::info('File name: ' . $fileName);
                 $filePath = $request->image->storeAs('pet_images', $fileName, 'public');
-
+                Log::info('File path: ' . $filePath);
+    
                 $image = new Image();
                 $image->source_url = 'storage/' . $filePath;
                 $image->alt_text = $request->alt_text;
                 $image->save();
-
+    
+                Log::info('Image saved with ID: ' . $image->id);
+    
                 $validatedData['photo_id'] = $image->id;
+            } else {
+                Log::warning('No image file present in the request.');
             }
-
+    
             $validatedData['pet_owner_id'] = Auth::id();
             $pet = Pet::create($validatedData);
             $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-
+    
+            Log::info('Pet created with data:', $pet->toArray());
+    
             DB::commit();
-
+    
             return response()->json(['status' => 'success', 'pet' => $pet]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error creating pet: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
             return response()->json(['status' => 'error', 'message' => 'Error creating pet', 'error' => $e->getMessage()], 500);
         }
     }
