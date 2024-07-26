@@ -8,42 +8,84 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\BusinessSchedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+
 
 class AppointmentController extends Controller
 {
-    public function checkAvailability($serviceId, $dateTime)
+    public function checkAvailability(Request $request, $businessId)
 {
-    $service = Service::findOrFail($serviceId);
-    $dateTime = Carbon::parse($dateTime);
+    $request->validate([
+        'date' => 'required|date_format:d-m-Y',
+        'time' => 'required|date_format:H:i',
+    ]);
 
-    $dayOfWeek = $dateTime->format('l'); 
+    $date = Carbon::createFromFormat('d-m-Y', $request->date);
+    $time = Carbon::createFromFormat('H:i', $request->time);
+    $dateTime = $date->setTime($time->hour, $time->minute);
 
-    // Verificar el horario de trabajo del negocio
-    $businessSchedule = BusinessSchedule::where('business_id', $service->business_id)
-        ->where('day_of_week', $dayOfWeek)
-        ->where('start_time', '<=', $dateTime->format('H:i:s'))
-        ->where('end_time', '>=', $dateTime->copy()->addMinutes($service->duration)->format('H:i:s'))
+    // Configura la localización a español para obtener el día de la semana en español
+    $date->locale('es');
+    $dayOfWeek = $date->isoFormat('dddd'); // 'dddd' obtiene el nombre completo del día de la semana
+    $normalizedDayOfWeek = mb_strtolower($dayOfWeek); // Convierte a minúsculas
+
+    // Log de depuración
+    Log::debug('Datos de la solicitud: ', [
+        'date' => $date->toDateString(),
+        'time' => $time->toTimeString(),
+        'dayOfWeek' => $dayOfWeek,
+        'formattedDateTime' => $dateTime->format('Y-m-d H:i:s'),
+        'normalizedDayOfWeek' => $normalizedDayOfWeek
+    ]);
+
+    // Verifica el horario de trabajo del negocio
+    $businessSchedule = BusinessSchedule::where('business_id', $businessId)
+        ->where('day_of_week', $normalizedDayOfWeek)
         ->first();
 
     if (!$businessSchedule) {
+        return response()->json(['status' => 'error', 'message' => 'Business is closed on this day'], 400);
+    }
+
+    // Log para verificar los time_slots
+    Log::debug('Time slots: ', [
+        'time_slots' => $businessSchedule->time_slots
+    ]);
+
+    // Verifica si el horario solicitado está dentro de algún time_slot
+    $isOpen = false;
+
+    foreach ($businessSchedule->time_slots as $slot) {
+        $slotStart = Carbon::createFromFormat('H:i', $slot['start_time']);
+        $slotEnd = Carbon::createFromFormat('H:i', $slot['end_time']);
+
+        // Log para verificar cada slot
+        Log::debug('Verificando time slot: ', [
+            'slotStart' => $slotStart->format('H:i'),
+            'slotEnd' => $slotEnd->format('H:i'),
+            'dateTime' => $dateTime->format('H:i')
+        ]);
+
+        // Asegúrate de que la comparación sea correcta, y verifica si la hora está dentro del intervalo
+        if ($dateTime->format('H:i') >= $slotStart->format('H:i') && $dateTime->format('H:i') <= $slotEnd->format('H:i')) {
+            $isOpen = true;
+            break;
+        }
+    }
+
+    if (!$isOpen) {
         return response()->json(['status' => 'error', 'message' => 'Business is closed at this time'], 400);
     }
 
-    // Verificar las reservas existentes para el mismo servicio en la misma hora
-    $appointments = DB::table('appointment_pet_service')
-        ->where('service_id', $serviceId)
-        ->where('appointment_time', $dateTime)
-        ->count();
-
-    if ($appointments >= $service->max_services_simultaneously) {
-        return response()->json(['status' => 'error', 'message' => 'No availability at this time'], 400);
-    }
-
-    return response()->json(['status' => 'success', 'message' => 'Service is available at this time']);
+    return response()->json(['status' => 'success', 'message' => 'Business is open at this time']);
 }
 
-public function store(Request $request)
+
+
+
+
+    public function store(Request $request)
     {
         $validatedData = $request->validate([
             'business_id' => 'required|exists:businesses,id',
@@ -91,5 +133,4 @@ public function store(Request $request)
 
         return response()->json($appointments);
     }
-
 }
