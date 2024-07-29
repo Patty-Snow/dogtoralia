@@ -5,7 +5,6 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
-    
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -71,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Mexico_City',
 
     /*
     |--------------------------------------------------------------------------

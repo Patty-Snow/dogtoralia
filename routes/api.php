@@ -158,6 +158,5 @@ Route::get('/business/{businessId}/schedule', [BusinessScheduleController::class
 
 // Rutas para gestionar citas
 
-Route::get('/services/availability/{service_id}', [AppointmentController::class, 'checkAvailability']);// Ruta para verificar la disponibilidad de un servicio en una fecha específica
-Route::post('/appointments', [AppointmentController::class, 'store']);// Ruta para crear una nueva cita
-Route::get('/appointments', [AppointmentController::class, 'index']);// Ruta para obtener las citas del propietario de mascotas autenticado
+Route::get('/business-availability/{business_id}', [AppointmentController::class, 'checkAvailability']);// Ruta para verificar la disponibilidad de un servicio en una fecha específica
+Route::get('/index-availability', [AppointmentController::class, 'indexOpenBusinesses']);
