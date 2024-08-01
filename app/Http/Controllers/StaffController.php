@@ -14,7 +14,7 @@ class StaffController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:business_owner_api')->except(['login']);
+        $this->middleware('auth:business_owner_api')->except(['login, refresh, logout']);
     }
 
     public function index()

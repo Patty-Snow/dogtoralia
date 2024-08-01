@@ -137,6 +137,9 @@ class PetController extends Controller
     
             Log::info('Validated data:', $validatedData);
     
+            $filePath = null;
+            $imageId = null;
+    
             if (!empty($validatedData['birth_date'])) {
                 $validatedData['birth_date'] = Carbon::createFromFormat('d-m-Y', $validatedData['birth_date'])->format('Y-m-d');
             }
@@ -155,7 +158,8 @@ class PetController extends Controller
     
                 Log::info('Image saved with ID: ' . $image->id);
     
-                $validatedData['photo_id'] = $image->id;
+                $imageId = $image->id;
+                $validatedData['photo_id'] = $imageId;
             } else {
                 Log::warning('No image file present in the request.');
             }
@@ -168,7 +172,21 @@ class PetController extends Controller
     
             DB::commit();
     
-            return response()->json(['status' => 'success', 'pet' => $pet]);
+            return response()->json([
+                'status' => 'success',
+                'id' => $pet->id,
+                'name' => $pet->name,
+                'species' => $pet->species,
+                'breed' => $pet->breed,
+                'birth_date' => $pet->birth_date,
+                'color' => $pet->color,
+                'gender' => $pet->gender,
+                'photo_id' => $imageId,
+                'filePath' => $filePath,
+                'pet_owner_id' => $pet->pet_owner_id,
+                'created_at' => $pet->created_at,
+                'updated_at' => $pet->updated_at
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating pet: ' . $e->getMessage(), [
@@ -177,6 +195,7 @@ class PetController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Error creating pet', 'error' => $e->getMessage()], 500);
         }
     }
+    
 
 
 
