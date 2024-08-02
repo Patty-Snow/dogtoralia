@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 class PetController extends Controller
 {
+
     public function index(Request $request, $pet_owner_id)
     {
         try {
@@ -29,12 +30,29 @@ class PetController extends Controller
                 throw new UnauthorizedException('Unauthorized access.');
             }
 
-            // Formatear la fecha de nacimiento
-            foreach ($pets as $pet) {
-                $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-            }
+            $petsData = $pets->map(function ($pet) {
+                $birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+                $filePath = $pet->photo ? $pet->photo->source_url : null;
+                $imageId = $pet->photo ? $pet->photo->id : null;
 
-            return response()->json(['status' => 'success', 'pets' => $pets]);
+                return [
+                    'status' => 'success',
+                    'id' => $pet->id,
+                    'name' => $pet->name,
+                    'species' => $pet->species,
+                    'breed' => $pet->breed,
+                    'birth_date' => $birth_date,
+                    'color' => $pet->color,
+                    'gender' => $pet->gender,
+                    'photo_id' => $imageId,
+                    'filePath' => $filePath,
+                    'pet_owner_id' => $pet->pet_owner_id,
+                    'created_at' => $pet->created_at,
+                    'updated_at' => $pet->updated_at,
+                ];
+            });
+
+            return response()->json(['status' => 'success', 'pets' => $petsData]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
@@ -50,12 +68,29 @@ class PetController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'No pets found'], 404);
             }
 
-            // Formatear la fecha de nacimiento
-            foreach ($pets as $pet) {
-                $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-            }
+            $petsData = $pets->map(function ($pet) {
+                $birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+                $filePath = $pet->photo ? $pet->photo->source_url : null;
+                $imageId = $pet->photo ? $pet->photo->id : null;
 
-            return response()->json(['status' => 'success', 'pets' => $pets]);
+                return [
+                    'status' => 'success',
+                    'id' => $pet->id,
+                    'name' => $pet->name,
+                    'species' => $pet->species,
+                    'breed' => $pet->breed,
+                    'birth_date' => $birth_date,
+                    'color' => $pet->color,
+                    'gender' => $pet->gender,
+                    'photo_id' => $imageId,
+                    'filePath' => $filePath,
+                    'pet_owner_id' => $pet->pet_owner_id,
+                    'created_at' => $pet->created_at,
+                    'updated_at' => $pet->updated_at,
+                ];
+            });
+
+            return response()->json(['status' => 'success', 'pets' => $petsData]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
@@ -65,48 +100,61 @@ class PetController extends Controller
     {
         try {
             $perPage = $request->query('per_page', 20);
+            $petOwnerId = Auth::guard('pet_owner_api')->id();
 
-            if (Auth::guard('pet_owner_api')->check()) {
-                $petOwnerId = Auth::id();
-                $pets = Pet::where('pet_owner_id', $petOwnerId)->paginate($perPage);
+            $pets = Pet::where('pet_owner_id', $petOwnerId)->paginate($perPage);
 
-                if ($pets->isEmpty()) {
-                    return response()->json(['status' => 'error', 'message' => 'No pets found for this pet owner'], 404);
-                }
+            $petsData = $pets->map(function ($pet) {
+                $birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+                $filePath = $pet->photo ? $pet->photo->source_url : null;
+                $imageId = $pet->photo ? $pet->photo->id : null;
 
-                // Formatear la fecha de nacimiento
-                foreach ($pets as $pet) {
-                    $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-                }
+                return [
+                    'status' => 'success',
+                    'id' => $pet->id,
+                    'name' => $pet->name,
+                    'species' => $pet->species,
+                    'breed' => $pet->breed,
+                    'birth_date' => $birth_date,
+                    'color' => $pet->color,
+                    'gender' => $pet->gender,
+                    'photo_id' => $imageId,
+                    'filePath' => $filePath,
+                    'pet_owner_id' => $pet->pet_owner_id,
+                    'created_at' => $pet->created_at,
+                    'updated_at' => $pet->updated_at,
+                ];
+            });
 
-                return response()->json(['status' => 'success', 'pets' => $pets]);
-            } else {
-                throw new UnauthorizedException('Unauthorized access.');
-            }
+            return response()->json(['status' => 'success', 'pets' => $petsData]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pets', 'error' => $e->getMessage()], 500);
         }
     }
 
-    public function show($pet_id)
+    public function show($id)
     {
         try {
-            if (Auth::guard('pet_owner_api')->check()) {
-                $pet = Pet::withTrashed()->findOrFail($pet_id);
+            $pet = Pet::findOrFail($id);
+            $birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
+            $filePath = $pet->photo ? $pet->photo->source_url : null;
+            $imageId = $pet->photo ? $pet->photo->id : null;
 
-                if ($pet->pet_owner_id != Auth::id()) {
-                    throw new UnauthorizedException('You do not have permission to access this resource.');
-                }
-            } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
-                $pet = Pet::withTrashed()->findOrFail($pet_id);
-            } else {
-                throw new UnauthorizedException('Unauthorized access.');
-            }
-
-            // Formatear la fecha de nacimiento
-            $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-
-            return response()->json(['status' => 'success', 'pet' => $pet]);
+            return response()->json([
+                'status' => 'success',
+                'id' => $pet->id,
+                'name' => $pet->name,
+                'species' => $pet->species,
+                'breed' => $pet->breed,
+                'birth_date' => $birth_date,
+                'color' => $pet->color,
+                'gender' => $pet->gender,
+                'photo_id' => $imageId,
+                'filePath' => $filePath,
+                'pet_owner_id' => $pet->pet_owner_id,
+                'created_at' => $pet->created_at,
+                'updated_at' => $pet->updated_at,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Error fetching pet', 'error' => $e->getMessage()], 500);
         }
@@ -307,39 +355,59 @@ class PetController extends Controller
     {
         try {
             $perPage = $request->query('per_page', 20);
-
+    
             if (Auth::guard('pet_owner_api')->check()) {
                 Log::info('Pet owner authenticated. Fetching pets for owner ID.', ['id' => Auth::id()]);
-                $pets = Pet::onlyTrashed()->where('pet_owner_id', Auth::id())->paginate($perPage);
+                $pets = Pet::onlyTrashed()->where('pet_owner_id', Auth::id())->with('photo')->paginate($perPage);
             } elseif (Auth::guard('business_owner_api')->check() || Auth::guard('staff_api')->check()) {
                 Log::info('Business or staff authenticated.');
-                $pets = Pet::onlyTrashed()->paginate($perPage);
+                $pets = Pet::onlyTrashed()->with('photo')->paginate($perPage);
             } else {
                 throw new UnauthorizedException('Unauthorized access.');
             }
-
+    
             if ($pets->isEmpty()) {
                 return response()->json(['status' => 'error', 'message' => 'No trashed pets found'], 404);
             }
-
-            // Formatear la fecha de nacimiento
-            foreach ($pets as $pet) {
-                if ($pet->birth_date) {
-                    $pet->birth_date = Carbon::parse($pet->birth_date)->format('d-m-Y');
-                }
-            }
-
-            return response()->json(['status' => 'success', 'pets' => $pets]);
+    
+            // Formatear las mascotas
+            $formattedPets = $pets->map(function ($pet) {
+                $photo = $pet->photo;
+                return [
+                    'status' => 'success',
+                    'id' => $pet->id,
+                    'name' => $pet->name,
+                    'species' => $pet->species,
+                    'breed' => $pet->breed,
+                    'birth_date' => $pet->birth_date ? Carbon::parse($pet->birth_date)->format('d-m-Y') : null,
+                    'color' => $pet->color,
+                    'gender' => $pet->gender,
+                    'photo_id' => $photo ? $photo->id : null,
+                    'filePath' => $photo ? $photo->source_url : null,
+                    'pet_owner_id' => $pet->pet_owner_id,
+                    'created_at' => $pet->created_at,
+                    'updated_at' => $pet->updated_at,
+                ];
+            });
+    
+            return response()->json([
+                'status' => 'success',
+                'pets' => $formattedPets,
+            ]);
         } catch (\Exception $e) {
             Log::error('Error fetching trashed pets.', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
-            return response()->json(['status' => 'error', 'message' => 'Error fetching trashed pets', 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
+    
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error fetching trashed pets',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
         }
-    }
-
+    }    
 
 
 
