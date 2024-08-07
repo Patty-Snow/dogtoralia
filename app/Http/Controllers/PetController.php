@@ -252,6 +252,12 @@ class PetController extends Controller
         DB::beginTransaction();
 
         try {
+            $pet = Pet::withTrashed()->where('id', $id)->where('pet_owner_id', Auth::id())->first();
+
+            if (!$pet) {
+                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to update this pet.'], 404);
+            }
+
             $validatedData = $request->validate([
                 'name' => [
                     'sometimes',
@@ -259,7 +265,7 @@ class PetController extends Controller
                     'max:255',
                     Rule::unique('pets')->where(function ($query) {
                         return $query->where('pet_owner_id', Auth::id());
-                    }),
+                    })->ignore($pet->id),
                 ],
                 'species' => 'sometimes|string|max:255',
                 'breed' => 'sometimes|string|max:255',
@@ -269,12 +275,6 @@ class PetController extends Controller
                 'image' => 'sometimes|image|max:2028',
                 'alt_text' => 'sometimes|string|max:255'
             ]);
-
-            $pet = Pet::withTrashed()->where('id', $id)->where('pet_owner_id', Auth::id())->first();
-
-            if (!$pet) {
-                return response()->json(['status' => 'error', 'message' => 'Pet not found or you do not have permission to update this pet.'], 404);
-            }
 
             $filePath = null;
             $imageId = $pet->photo_id;
@@ -334,6 +334,7 @@ class PetController extends Controller
 
 
 
+
     public function destroy($id)
     {
         try {
@@ -355,7 +356,7 @@ class PetController extends Controller
     {
         try {
             $perPage = $request->query('per_page', 20);
-    
+
             if (Auth::guard('pet_owner_api')->check()) {
                 Log::info('Pet owner authenticated. Fetching pets for owner ID.', ['id' => Auth::id()]);
                 $pets = Pet::onlyTrashed()->where('pet_owner_id', Auth::id())->with('photo')->paginate($perPage);
@@ -365,11 +366,11 @@ class PetController extends Controller
             } else {
                 throw new UnauthorizedException('Unauthorized access.');
             }
-    
+
             if ($pets->isEmpty()) {
                 return response()->json(['status' => 'error', 'message' => 'No trashed pets found'], 404);
             }
-    
+
             // Formatear las mascotas
             $formattedPets = $pets->map(function ($pet) {
                 $photo = $pet->photo;
@@ -389,7 +390,7 @@ class PetController extends Controller
                     'updated_at' => $pet->updated_at,
                 ];
             });
-    
+
             return response()->json([
                 'status' => 'success',
                 'pets' => $formattedPets,
@@ -399,7 +400,7 @@ class PetController extends Controller
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-    
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error fetching trashed pets',
@@ -407,7 +408,7 @@ class PetController extends Controller
                 'trace' => $e->getTraceAsString()
             ], 500);
         }
-    }    
+    }
 
 
 
