@@ -143,7 +143,7 @@ Route::group(['middleware' => ['auth:business_owner_api']], function () {
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 });
 
-Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{business_id}', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
 
