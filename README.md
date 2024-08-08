@@ -1,7 +1,7 @@
 ### Autenticación para Dueños de Mascotas (Pet Owners)
 
 - **Registrar un nuevo dueño de mascota**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/register`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/register`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -15,7 +15,7 @@
     }
     ```
 - **Añadir dirección como dueño de mascota**
-  - **URL:** `https://devs-devitm.com/api/pet-owner/set-address`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet-owner/set-address`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -26,7 +26,7 @@
     ```
 
 - **Login**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/login`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/login`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -37,18 +37,18 @@
     ```
 
 - **Refrescar token**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/refresh`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/refresh`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Logout**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/logout`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/logout`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
  
 - **Obtener detalles de cuenta**
 
-  - **URL:** `https://devs-devitm.com/api/pet_owner/me`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/me`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
@@ -57,12 +57,12 @@
 
 - **Obtener detalles de un dueño de mascota**
 
-  - **URL:** `https://devs-devitm.com/api/pet_owner/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/{id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información del dueño de mascota**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/update`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/update`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -73,22 +73,22 @@
     ```
 
 - **Eliminar dueño de mascota**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/delete`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/delete`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
 - **Listar dueños de mascotas eliminados**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/trashed`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/trashed`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Restaurar dueño de mascota eliminado**
-  - **URL:** https://devs-devitm.com/api/pet_owner/restore/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/restore/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Eliminar permanentemente dueño de mascota**
-  - **URL:** `https://devs-devitm.com/api/pet_owner/force_delete/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pet_owner/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
@@ -97,7 +97,7 @@
 ### Autenticación y Gestión de Dueños de Negocios (Business Owners)
 
 - **Registrar un nuevo dueño de negocio**
-  - **URL:** `https://devs-devitm.com/api/business_owner/register`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/register`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -108,12 +108,12 @@
       "password": "Password123!",
       "password_confirmation": "Password123!",
       "phone_number": "1234567890",
-      "rfc": "RFC123456789",
+      "rfc": "RFC123456789"
     }
     ```
 
 - **Login**
-  - **URL:** `https://devs-devitm.com/api/business_owner/login`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/login`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -124,22 +124,22 @@
     ```
 
 - **Refrescar token**
-  - **URL:** `https://devs-devitm.com/api/business_owner/refresh`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/refresh`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Logout**
-  - **URL:** `https://devs-devitm.com/api/business_owner/logout`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/logout`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Obtener detalles del dueño de negocio autenticado**
-  - **URL:** `https://devs-devitm.com/api/business_owner/me`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/me`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información del dueño de negocio**
-  - **URL:** `https://devs-devitm.com/api/business_owner/update`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/update`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -151,22 +151,22 @@
     ```
 
 - **Eliminar dueño de negocio**
-  - **URL:** `https://devs-devitm.com/api/business_owner/delete`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/delete`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
 - **Listar dueños de negocios eliminados**
-  - **URL:** `https://devs-devitm.com/api/business_owner/trashed`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/trashed`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Restaurar dueño de negocio eliminado**
-  - **URL:** `https://devs-devitm.com/api/business_owner/restore/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/restore/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Eliminar permanentemente dueño de negocio**
-  - **URL:** `https://devs-devitm.com/api/business_owner/force_delete/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business_owner/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
  
@@ -182,11 +182,11 @@
 - **Paginación:** Los resultados se devuelven de 20 en 20 items por página por defecto.
 - **Parámetros de consulta (`query params`):**
   - `page`: Número de página para la paginación.
-  - `per_page`: Número de items por página. Por ejemplo, `https://devs-devitm.com/api/businesses/all?per_page=5` devolverá 5 items por página.
+  - `per_page`: Número de items por página. Por ejemplo, `https://backend.developers-cideapps.com/api/businesses/all?per_page=5` devolverá 5 items por página.
 
 - **Listar todos los negocios de un mismo dueño**
    
-  - **URL:** `https://devs-devitm.com/api/business`
+  - **URL:** `https://backend.developers-cideapps.com/api/business`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
@@ -195,14 +195,14 @@
 
 - **Listar todos los negocios**
    
-  - **URL:** `https://devs-devitm.com/api/business/all`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/all`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 
 
 - **Registrar un nuevo negocio**
-  - **URL:** `https://devs-devitm.com/api/business/register`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/register`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -214,7 +214,7 @@
     }
     ```
 - **Agregar dirección a un negocio**
-  - **URL:** `https://devs-devitm.com/api/business/set-address/{business_id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/set-address/{business_id}`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -225,12 +225,12 @@
     ```
 
 - **Obtener detalles de un negocio**
-  - **URL:** `https://devs-devitm.com/api/business/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/{id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información de un negocio**
-  - **URL:** `https://devs-devitm.com/api/business/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/{id}`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -240,22 +240,22 @@
     ```
 
 - **Eliminar un negocio**
-  - **URL:** `https://devs-devitm.com/api/business/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/{id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
 - **Listar negocios eliminados**
-  - **URL:** `https://devs-devitm.com/api/business/trashed`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/trashed`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Restaurar un negocio eliminado**
-  - **URL:** `https://devs-devitm.com/api/business/restore/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/restore/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Eliminar permanentemente un negocio**
-  - **URL:** `https://devs-devitm.com/api/business/force_delete/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
@@ -271,7 +271,7 @@
 - **Paginación:** Los resultados se devuelven de 20 en 20 items por página por defecto.
 - **Parámetros de consulta (`query params`):**
   - `page`: Número de página para la paginación.
-  - `per_page`: Número de items por página. Por ejemplo, `https://devs-devitm.com/api/pets?per_page=3` devolverá 3 items por página.
+  - `per_page`: Número de items por página. Por ejemplo, `https://backend.developers-cideapps.com/api/pets?per_page=3` devolverá 3 items por página.
 
 
   
@@ -279,7 +279,7 @@
 > El siguiente endpoint funciona para listar a todas las mascotas registradas en el sistema, debes estar autenticado como Business Owner o Staff (próximamente habrá un superusuario quien será quien pueda acceder a esta ruta).
 
 - **Listar todas las mascotas**
-  - **URL:** `https://devs-devitm.com/api/pets`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets`
   - **Método:** `GET`
   - **Body:** No requiere cuerpo
 
@@ -289,7 +289,7 @@
 
 - **Listar todas las mascotas de un usuario**
 
-  - **URL:** `https://devs-devitm.com/api/pets/index/{pet_owner_id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets/index/{pet_owner_id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
  
@@ -300,7 +300,7 @@
 - **Listar todas mis mascotas**
   
 
-  - **URL:** `https://devs-devitm.com/api/pets/index`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets/index`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
@@ -309,7 +309,7 @@
 > El siguiente endpoint permite subir una foto de tu mascota. Puedes probarlo en Postman enviando el body como form-data, añadiendo el campo `image` como tipo File y además puedes añadir un texto alternativo para tu foto añadiendo el campo `alt_text`.
 
 - **Registrar una nueva mascota**
-  - **URL:** `https://devs-devitm.com/api/pets`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -325,12 +325,12 @@
   - **Imagen de ejemplo para registrar mascota usando el form-data** ![Ejemplo de Postman](postman_registrarMascota.png)
 
 - **Obtener detalles de una mascota**
-  - **URL:** `https://devs-devitm.com/api/pets/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets/{id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información de una mascota**
-  - **URL:** `https://devs-devitm.com/api/pets/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets/{id}`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -340,7 +340,7 @@
     ```
 
 - **Eliminar una mascota**
-  - **URL:** `https://devs-devitm.com/api/pets/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/pets/{id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
@@ -349,12 +349,12 @@
 ### Gestión de Personal
 
 - **Listar todo el personal**
-  - **URL:** `https://devs-devitm.com/api/staff`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Registrar un nuevo miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/register/{business_id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/register/{business_id}`
   - **Método:** `POST`
   - **Body:**
     ```json
@@ -370,12 +370,12 @@
     ```
 
 - **Obtener detalles de un miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/{id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Actualizar información de un miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/{id}`
   - **Método:** `PUT`
   - **Body:**
     ```json
@@ -385,27 +385,27 @@
     ```
 
 - **Eliminar un miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/{id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
 
 - **Listar personal eliminado**
-  - **URL:** `https://devs-devitm.com/api/staff/trashed`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/trashed`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Restaurar personal eliminado**
-  - **URL:** `https://devs-devitm.com/api/staff/restore/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/restore/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Eliminar permanentemente un miembro del personal**
-  - **URL:** `https://devs-devitm.com/api/staff/force_delete/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/force_delete/{id}`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
 
 - **Inicio de sesión de un staff**
-  - **URL:** `https://devs-devitm.com/api/staff/login`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/login`
   - **Método:** `POST`
   - **Body:** 
       ```json
@@ -415,7 +415,7 @@
     }
     ```
 - **Cierre de sesión de un staff**
-  - **URL:** `https://devs-devitm.com/api/staff/logout`
+  - **URL:** `https://backend.developers-cideapps.com/api/staff/logout`
   - **Método:** `POST`
   - **Body:** *No requiere cuerpo*
     
@@ -425,12 +425,12 @@
 > Se requiere estar autenticado como dueño de negocio para registrar, actualizar o eliminar algun servicio.
 
 - **Listar servicios**
-  - **URL:** `https://devs-devitm.com/api/services`
+  - **URL:** `https://backend.developers-cideapps.com/api/services`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
 - **Mostrar detalles de un servicio**
-  - **URL:** `https://devs-devitm.com/api/services/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/services/{id}`
   - **Método:** `GET`
   - **Parámetros de URL:** `{id}`: ID del servicio que se desea obtener
  
@@ -438,7 +438,7 @@
 > Puede no mandar nada para el campo categoria y se colocara `services` como categoria default.
 
 - **Registrar un nuevo servicio**
-    - **URL:** `https://devs-devitm.com/api/services`
+    - **URL:** `https://backend.developers-cideapps.com/api/services`
     - **Método:** `POST`
     - **Body:**
       ```json
@@ -458,7 +458,7 @@
 > Puede agregar los campos de oferta en actualizar servicio ya que estos campos de inicio pueden ser nulos y puede que al registrar el servicio no tenga alguna oferta
 
 - **Actualizar un Servicio Existente**
-    - **URL:** `https://devs-devitm.com/api/services/{id}`
+    - **URL:** `https://backend.developers-cideapps.com/api/services/{id}`
     - **Método:** `PUT`
     - **Parámetros URL:** `{id}` (ID del servicio a actualizar)
     - **Body:**
@@ -478,7 +478,7 @@
       ```
      
 - **Eliminar un servicio**
-  - **URL:** `https://devs-devitm.com/api/services/{id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/services/{id}`
   - **Método:** `Delete`
   - **Parámetros de URL:** `{id}`: ID del servicio que se desea eliminar
   - **Body:** *No requiere cuerpo*
