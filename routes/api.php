@@ -130,8 +130,6 @@ Route::prefix('staff')->group(function () {
     Route::post('force_delete/{id}', [StaffController::class, 'forceDelete']);
 });
 
-
-
 //Rutas para formatear dirección a partir de coordenadas
 
 Route::post('/get-address', [GeolocationController::class, 'getAddress']);
@@ -143,7 +141,8 @@ Route::group(['middleware' => ['auth:business_owner_api']], function () {
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 });
 
-Route::get('/services/{business_id}', [ServiceController::class, 'index']);
+Route::get('/services/business/{business_id}', [ServiceController::class, 'index']);
+//Route::get('/services/{business_id}', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
 
