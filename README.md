@@ -425,7 +425,7 @@
 > Se requiere estar autenticado como dueño de negocio para registrar, actualizar o eliminar algun servicio.
 
 - **Listar servicios**
-  - **URL:** `https://backend.developers-cideapps.com/api/services`
+  - **URL:** `https://backend.developers-cideapps.com/api/services/business/{business_id}`
   - **Método:** `GET`
   - **Body:** *No requiere cuerpo*
 
@@ -438,7 +438,7 @@
 > Puede no mandar nada para el campo categoria y se colocara `services` como categoria default.
 
 - **Registrar un nuevo servicio**
-    - **URL:** `https://backend.developers-cideapps.com/api/services/business/{business_id}`
+    - **URL:** `https://backend.developers-cideapps.com/api/services`
     - **Método:** `POST`
     - **Body:**
       ```json
