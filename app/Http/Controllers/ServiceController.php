@@ -59,7 +59,7 @@ class ServiceController extends Controller
 
 
 
-    public function store(Request $request)
+    public function store(Request $request, $business_id)
     {
         try {
             $request->validate([
@@ -72,11 +72,10 @@ class ServiceController extends Controller
                 'discount_price' => ['nullable', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
                 'offer_start' => ['nullable', 'date'],
                 'offer_end' => ['nullable', 'date', 'after_or_equal:offer_start'],
-                'business_id' => ['required', 'exists:businesses,id'],
             ]);
 
             $businessOwner = Auth::guard('business_owner_api')->user();
-            $business = Business::where('id', $request->business_id)
+            $business = Business::where('id', $business_id)
                 ->where('business_owner_id', $businessOwner->id)
                 ->firstOrFail();
 

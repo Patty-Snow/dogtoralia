@@ -136,13 +136,12 @@ Route::post('/get-address', [GeolocationController::class, 'getAddress']);
 
 //Rutas para servicios
 Route::group(['middleware' => ['auth:business_owner_api']], function () {
-    Route::post('/services', [ServiceController::class, 'store']);
+    Route::post('/services/{business_id}', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 });
 
 Route::get('/services/business/{business_id}', [ServiceController::class, 'index']);
-//Route::get('/services/{business_id}', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
 
