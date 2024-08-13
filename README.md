@@ -438,8 +438,9 @@
 > Puede no mandar nada para el campo categoria y se colocara `services` como categoria default.
 
 - **Registrar un nuevo servicio**
-    - **URL:** `https://backend.developers-cideapps.com/api/services`
+    - **URL:** `https://backend.developers-cideapps.com/api/services/{business_id}`
     - **Método:** `POST`
+    - **Parámetros URL:** `{business_id}` (ID del negocio que tendra ese servicio)
     - **Body:**
       ```json
       {
@@ -450,7 +451,6 @@
         "max_services_simultaneously": 5,
         "duration": 60,
         "category": "Estetica",
-        "business_id": 1
       }
       ```
       
