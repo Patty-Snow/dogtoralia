@@ -486,7 +486,8 @@
 ## Controlador de Horarios
 
 > [!IMPORTANT]  
-> Se requiere estar autenticado como dueño de negocio para gestionar los horarios. Se requiere tener un negocio previamente registrado.
+> Se requiere estar autenticado como dueño de negocio para gestionar los horarios.
+> Se requiere tener un negocio previamente registrado.
 
 - **Listar horarios de un negocio**
   - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{business_id}`
@@ -494,79 +495,99 @@
   - **Body:** *No requiere cuerpo*
 
 - **Agregar nuevo horario**
+  - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{business_id}`
+  - **Método:** `POST`
+  - **Body:**
+    ```json
+    {
+      "schedule": [
+        {
+          "day_of_week": "Monday",
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "12:00"
+            },
+            {
+              "start_time": "13:00",
+              "end_time": "17:00"
+            }
+          ]
+        }
+      ]
+    }
+    ```
 
-  - **Registrar un horario único**
-    - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{business_id}`
-    - **Método:** `POST`
-    - **Body:**
-      ```json
-      {
-        "day": "Monday",
-        "start_time": "09:00",
-        "end_time": "18:00"
-      }
-      ```
-
-  - **Registrar varios horarios**
-    - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{business_id}`
-    - **Método:** `POST`
-    - **Body:**
-      ```json
-      {
-        "schedules": [
-          {
-            "day": "Monday",
-            "times": [
-              {"start_time": "09:00", "end_time": "12:00"},
-              {"start_time": "13:00", "end_time": "17:00"}
-            ]
-          },
-          {
-            "day": "Tuesday",
-            "times": [
-              {"start_time": "09:00", "end_time": "11:00"},
-              {"start_time": "12:00", "end_time": "15:00"},
-              {"start_time": "16:00", "end_time": "18:00"}
-            ]
-          },
-          {
-            "day": "Wednesday",
-            "times": [
-              {"start_time": "09:00", "end_time": "12:00"},
-              {"start_time": "14:00", "end_time": "17:00"}
-            ]
-          },
-          {
-            "day": "Thursday",
-            "times": [
-              {"start_time": "10:00", "end_time": "13:00"},
-              {"start_time": "14:00", "end_time": "17:00"}
-            ]
-          },
-          {
-            "day": "Friday",
-            "times": [
-              {"start_time": "09:00", "end_time": "12:00"},
-              {"start_time": "13:00", "end_time": "18:00"}
-            ]
-          }
-        ]
-      }
-      ```
+  - **Ejemplo con múltiples días y franjas horarias:**
+    ```json
+    {
+      "schedule": [
+        {
+          "day_of_week": "Monday",
+          "time_slots": [
+            {
+              "start_time": "09:00",
+              "end_time": "12:00"
+            },
+            {
+              "start_time": "13:00",
+              "end_time": "17:00"
+            }
+          ]
+        },
+        {
+          "day_of_week": "Tuesday",
+          "time_slots": [
+            {
+              "start_time": "10:00",
+              "end_time": "12:00"
+            },
+            {
+              "start_time": "14:00",
+              "end_time": "18:00"
+            }
+          ]
+        },
+        {
+          "day_of_week": "Wednesday",
+          "time_slots": [
+            {
+              "start_time": "08:00",
+              "end_time": "12:00"
+            },
+            {
+              "start_time": "13:00",
+              "end_time": "16:00"
+            }
+          ]
+        }
+      ]
+    }
+    ```
 
 - **Actualizar horario existente**
-  - **URL:** `https://backend.developers-cideapps.com/business/api/schedule/{Schedule_id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{Schedule_id}`
   - **Método:** `PUT`
   - **Body:**
     ```json
     {
-      "day": "Monday",
-      "start_time": "10:00",
-      "end_time": "17:00"
+      "day_of_week": "Monday",
+      "time_slots": [
+        {
+          "start_time": "10:00",
+          "end_time": "12:00"
+        },
+        {
+          "start_time": "14:00",
+          "end_time": "18:00"
+        }
+      ]
     }
     ```
 
 - **Eliminar horario de un negocio**
-  - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{Bussines_id}`
+  - **URL:** `https://backend.developers-cideapps.com/api/business/schedule/{business_id}`
   - **Método:** `DELETE`
   - **Body:** *No requiere cuerpo*
+  - **Nota:** El ID es del horario que se desea eliminar.
+
