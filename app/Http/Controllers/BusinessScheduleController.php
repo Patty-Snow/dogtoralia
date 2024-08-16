@@ -64,44 +64,42 @@ class BusinessScheduleController extends Controller
 
 
 
-    public function store(Request $request)
+    public function store(Request $request, $businessId)
     {
         try {
             $request->validate([
-                'business_id' => ['required', 'exists:businesses,id'],
                 'schedule' => ['required', 'array'],
                 'schedule.*.day_of_week' => ['required', 'string'],
                 'schedule.*.time_slots' => ['required', 'array'],
                 'schedule.*.time_slots.*.start_time' => ['required', 'string', 'date_format:H:i'],
                 'schedule.*.time_slots.*.end_time' => ['required', 'string', 'date_format:H:i'],
             ]);
-
+    
             $businessOwner = Auth::guard('business_owner_api')->user();
-            $business = Business::where('id', $request->business_id)
+            $business = Business::where('id', $businessId)
                 ->where('business_owner_id', $businessOwner->id)
                 ->firstOrFail();
-
-
+    
             $createdSchedules = [];
-
+    
             foreach ($request->schedule as $item) {
                 $timeSlots = $item['time_slots'];
-
+    
                 // Obtener la primera y última franja horaria
                 $firstSlot = $timeSlots[0];
                 $lastSlot = end($timeSlots);
-
+    
                 $schedule = BusinessSchedule::create([
-                    'business_id' => $request->business_id,
+                    'business_id' => $businessId,
                     'day_of_week' => $item['day_of_week'],
                     'start_time' => $firstSlot['start_time'],
                     'end_time' => $lastSlot['end_time'],
                     'time_slots' => $timeSlots,
                 ]);
-
+    
                 $createdSchedules[] = $schedule;
             }
-
+    
             return response()->json([
                 'status' => 'success',
                 'message' => 'Schedule created successfully',
@@ -121,9 +119,7 @@ class BusinessScheduleController extends Controller
             ], 500);
         }
     }
-
-
-
+    
 
     public function update(Request $request, $schedule_id)
     {

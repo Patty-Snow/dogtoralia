@@ -65,8 +65,12 @@ return [
         'driver' => 'jwt',
         'provider' => 'staffs',
     ],
-],
 
+    'admin_api' => [
+        'driver' => 'jwt',
+        'provider' => 'admins',
+    ],
+],
 'providers' => [
     'users' => [
         'driver' => 'eloquent',
@@ -86,6 +90,11 @@ return [
     'staffs' => [
         'driver' => 'eloquent',
         'model' => App\Models\Staff::class,
+    ],
+
+    'admins' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Admin::class,
     ],
 ],
 
@@ -129,5 +138,4 @@ return [
     */
 
     'password_timeout' => 10800,
-
 ];

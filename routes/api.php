@@ -13,6 +13,7 @@ use App\Http\Controllers\GeolocationController;
 use App\Http\Controllers\BusinessOwnerController;
 use App\Http\Controllers\StaffScheduleController;
 use App\Http\Controllers\BusinessScheduleController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,14 +148,22 @@ Route::get('/services/{id}', [ServiceController::class, 'show']);
 
 // Rutas para horarios de negocios
 Route::group(['middleware' => ['auth:business_owner_api']], function () {
-    Route::post('/business/schedule', [BusinessScheduleController::class, 'store']);
+    Route::post('/business/schedule/{business_id}', [BusinessScheduleController::class, 'store']);
     Route::put('/business/schedule/{schedule_id}', [BusinessScheduleController::class, 'update']);
-    Route::delete('/business/{businessId}/schedule', [BusinessScheduleController::class, 'destroy']);
+    Route::delete('/business/schedule/{schedule_id}', [BusinessScheduleController::class, 'destroy']);
 });
 
-Route::get('/business/{businessId}/schedule', [BusinessScheduleController::class, 'show']);
+Route::get('/business/schedule/{businessId}', [BusinessScheduleController::class, 'show']);
 
 // Rutas para gestionar citas
 
 Route::get('/business-availability/{business_id}', [AppointmentController::class, 'checkAvailability']);// Ruta para verificar la disponibilidad de un servicio en una fecha específica
 Route::get('/index-availability', [AppointmentController::class, 'indexOpenBusinesses']);
+
+// Rutas para Admin
+Route::prefix('admin')->group(function () {
+    Route::post('login', [AdminController::class, 'login']);
+    Route::post('logout', [AdminController::class, 'logout']);
+    Route::get('profile', [AdminController::class, 'show']);
+    Route::put('profile', [AdminController::class, 'update']);
+});

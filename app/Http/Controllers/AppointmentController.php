@@ -25,12 +25,10 @@ class AppointmentController extends Controller
         $time = Carbon::createFromFormat('H:i', $request->time);
         $dateTime = $date->setTime($time->hour, $time->minute);
 
-        // Configura la localización a español para obtener el día de la semana en español
         $date->locale('es');
-        $dayOfWeek = $date->isoFormat('dddd'); // 'dddd' obtiene el nombre completo del día de la semana
-        $normalizedDayOfWeek = mb_strtolower($dayOfWeek); // Convierte a minúsculas
+        $dayOfWeek = $date->isoFormat('dddd'); 
+        $normalizedDayOfWeek = mb_strtolower($dayOfWeek); 
 
-        // Log de depuración
         Log::debug('Datos de la solicitud: ', [
             'date' => $date->toDateString(),
             'time' => $time->toTimeString(),
@@ -39,7 +37,6 @@ class AppointmentController extends Controller
             'normalizedDayOfWeek' => $normalizedDayOfWeek
         ]);
 
-        // Verifica el horario de trabajo del negocio
         $businessSchedule = BusinessSchedule::where('business_id', $businessId)
             ->where('day_of_week', $normalizedDayOfWeek)
             ->first();
@@ -48,26 +45,22 @@ class AppointmentController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Business is closed on this day'], 400);
         }
 
-        // Log para verificar los time_slots
         Log::debug('Time slots: ', [
             'time_slots' => $businessSchedule->time_slots
         ]);
 
-        // Verifica si el horario solicitado está dentro de algún time_slot
         $isOpen = false;
 
         foreach ($businessSchedule->time_slots as $slot) {
             $slotStart = Carbon::createFromFormat('H:i', $slot['start_time']);
             $slotEnd = Carbon::createFromFormat('H:i', $slot['end_time']);
 
-            // Log para verificar cada slot
             Log::debug('Verificando time slot: ', [
                 'slotStart' => $slotStart->format('H:i'),
                 'slotEnd' => $slotEnd->format('H:i'),
                 'dateTime' => $dateTime->format('H:i')
             ]);
 
-            // Asegúrate de que la comparación sea correcta, y verifica si la hora está dentro del intervalo
             if ($dateTime->format('H:i') >= $slotStart->format('H:i') && $dateTime->format('H:i') <= $slotEnd->format('H:i')) {
                 $isOpen = true;
                 break;
@@ -85,38 +78,35 @@ class AppointmentController extends Controller
 
     public function indexOpenBusinesses()
     {
-        // Obtén la fecha y hora actuales
         $now = Carbon::now();
-        $dayOfWeek = $now->locale('es')->isoFormat('dddd'); // Obtiene el día de la semana en español
-        $normalizedDayOfWeek = mb_strtolower($dayOfWeek); // Convierte a minúsculas
+        $dayOfWeek = $now->locale('es')->isoFormat('dddd'); 
+        $normalizedDayOfWeek = mb_strtolower($dayOfWeek); 
         $currentTime = $now->format('H:i');
 
-        // Log de depuración
+        
         Log::debug('Verificando negocios abiertos: ', [
             'currentDayOfWeek' => $normalizedDayOfWeek,
             'currentTime' => $currentTime
         ]);
 
-        // Busca los horarios de negocios que estén abiertos a la hora actual
         $openBusinesses = BusinessSchedule::where('day_of_week', $normalizedDayOfWeek)
             ->whereJsonContains('time_slots', function ($query) use ($currentTime) {
                 $query->where('start_time', '<=', $currentTime)
                     ->where('end_time', '>=', $currentTime);
             })
-            ->with('business:id,name') // Obtén solo el ID y el nombre del negocio
+            ->with('business:id,name') 
             ->get();
 
-        // Filtra los resultados para asegurarse de que los negocios existan
         $openBusinesses = $openBusinesses->filter(function ($schedule) {
             return $schedule->business !== null;
         });
 
-        // Verifica si hay negocios abiertos
+        
         if ($openBusinesses->isEmpty()) {
             return response()->json(['status' => 'error', 'message' => 'No businesses are open at this time'], 404);
         }
 
-        // Construye la respuesta con los datos necesarios
+        
         $response = $openBusinesses->map(function ($schedule) {
             return [
                 'business_id' => $schedule->business_id,

@@ -191,60 +191,41 @@ class BusinessOwnerController extends Controller
             ], 500);
         }
     }
-
     public function update(Request $request)
     {
         try {
-            $businessOwner = Auth::guard('business_owner_api')->user();
-
+            $admin = Auth::guard('admin_api')->user();
+    
             $request->validate([
                 'name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'last_name' => ['sometimes', 'string', 'regex:/^[a-zA-Z\s]+$/'],
-                'email' => ['sometimes', 'string', 'email', 'unique:business_owners,email'],
+                'email' => ['sometimes', 'string', 'email', 'unique:admins,email,' . $admin->id],
                 'password' => [
                     'sometimes', 'string', 'min:8', 'confirmed',
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?]{8,}$/'
                 ],
-                'phone_number' => ['sometimes', 'string', 'regex:/^[0-9]{9,15}$/'],
-                'rfc' => ['sometimes', 'string', 'max:13'],
-                'profile_photo' => ['nullable', 'image', 'max:2048'],
             ], [
                 'name.regex' => 'Name can only contain letters and spaces.',
-                'last_name.regex' => 'Last name can only contain letters and spaces.',
                 'password.confirmed' => 'The password confirmation does not match.',
-                'phone_number.regex' => 'Phone number can only contain numbers and should be between 9 and 15 digits.',
             ]);
-
+    
             if ($request->filled('name')) {
-                $businessOwner->name = $request->input('name');
+                $admin->name = $request->input('name');
             }
-
-            if ($request->filled('last_name')) {
-                $businessOwner->last_name = $request->input('last_name');
+    
+            if ($request->filled('email')) {
+                $admin->email = $request->input('email');
             }
-
+    
             if ($request->filled('password')) {
-                $businessOwner->password = Hash::make($request->password);
+                $admin->password = Hash::make($request->password);
             }
-
-            if ($request->filled('phone_number')) {
-                $businessOwner->phone_number = $request->input('phone_number');
-            }
-
-            if ($request->hasFile('profile_photo')) {
-                if ($businessOwner->profile_photo) {
-                    Storage::disk('public')->delete($businessOwner->profile_photo);
-                }
-                $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
-                $businessOwner->profile_photo = $profilePhotoPath;
-            }
-
-            $businessOwner->save();
-
+    
+            $admin->save();
+    
             return response()->json([
                 'status' => 'success',
                 'message' => 'Profile updated successfully',
-                'user' => $businessOwner->fresh()
+                'user' => $admin->fresh()
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -256,92 +237,6 @@ class BusinessOwnerController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while trying to update the profile',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function destroy()
-    {
-        try {
-            $businessOwner = Auth::guard('business_owner_api')->user();
-
-            if ($businessOwner->profile_photo) {
-                Storage::disk('public')->delete($businessOwner->profile_photo);
-            }
-
-            $businessOwner->delete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Profile deleted successfully',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while trying to delete the profile',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function restore($id)
-    {
-        try {
-            $businessOwner = BusinessOwner::onlyTrashed()->findOrFail($id);
-            $businessOwner->restore();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Profile restored successfully',
-                'user' => $businessOwner
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while trying to restore the profile',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function forceDelete($id)
-    {
-        try {
-            $businessOwner = BusinessOwner::onlyTrashed()->findOrFail($id);
-
-            if ($businessOwner->profile_photo) {
-                Storage::disk('public')->delete($businessOwner->profile_photo);
-            }
-
-            $businessOwner->forceDelete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Profile permanently deleted',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while trying to permanently delete the profile',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function trashed()
-    {
-        try {
-            $trashedBusinessOwners = BusinessOwner::onlyTrashed()->get();
-
-            return response()->json([
-                'status' => 'success',
-                'data' => $trashedBusinessOwners,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while trying to fetch trashed profiles',
                 'error' => $e->getMessage(),
             ], 500);
         }
